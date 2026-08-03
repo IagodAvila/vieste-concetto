@@ -14,6 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase,
     title: "VIESTE CONCETTO — Moda brasileira contemporânea",
     description,
+    icons: { icon: "/assets/monogram-vieste.svg" },
     openGraph: {
       title: "VIESTE CONCETTO — Moda brasileira contemporânea",
       description,

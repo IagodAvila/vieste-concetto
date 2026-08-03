@@ -22,7 +22,6 @@ export function Footer() {
           <p>© 2026 Vieste Concetto. Todos os direitos reservados.</p>
           <ul className="flex flex-wrap gap-2">{["Pix", "Visa", "Mastercard", "Elo", "Amex", "Boleto"].map((item) => <li className="border border-border px-2.5 py-1 tracking-wide" key={item}>{item}</li>)}</ul>
         </div>
-        <p className="mt-6 text-[.65rem] text-muted-foreground">Protótipo de demonstração. Produtos, preços e descrições são fictícios.</p>
       </div>
     </footer>
   );
