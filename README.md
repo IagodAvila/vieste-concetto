@@ -8,8 +8,8 @@ Reformulação da experiência digital e do e-commerce da **Vieste Concetto**, m
 
 <table>
   <tr>
-    <th>Antes</th>
-    <th>Depois</th>
+    <th>Site atual</th>
+    <th>Reformulação proposta</th>
   </tr>
   <tr>
     <td><img src="public/readme/vieste-antes.jpg" alt="Página inicial da Vieste antes da reformulação" /></td>
@@ -17,7 +17,7 @@ Reformulação da experiência digital e do e-commerce da **Vieste Concetto**, m
   </tr>
 </table>
 
-A evolução visual inclui a aplicação do manual da marca, reconstrução vetorial dos logotipos, adoção da paleta oficial, incorporação da Red Velvet e uma hierarquia mais coerente entre navegação, campanha e conteúdo editorial.
+A primeira imagem registra o e-commerce atualmente publicado em [viesteconcetto.com.br](https://www.viesteconcetto.com.br/). A segunda apresenta a reformulação desenvolvida neste repositório, com aplicação do manual da marca, reconstrução vetorial dos logotipos, adoção da paleta oficial, incorporação da Red Velvet e uma hierarquia mais coerente entre navegação, campanha e conteúdo editorial.
 
 ## Sobre o projeto
 
