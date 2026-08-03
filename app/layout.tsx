@@ -7,21 +7,21 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = requestHeaders.get("host") ?? "localhost:3000";
   const protocol = host.startsWith("localhost") ? "http" : "https";
   const metadataBase = new URL(`${protocol}://${host}`);
-  const description = "Beachwear e resortwear criados no Brasil para vestir o tempo, a pele e a liberdade.";
+  const description = "Coleções de forma precisa e matérias que acolhem o corpo. Feminino e UOMO, com envio para todo o Brasil.";
 
   return {
     metadataBase,
-    title: "Vieste Concetto — O verão começa por dentro",
+    title: "VIESTE CONCETTO — Moda brasileira contemporânea",
     description,
     openGraph: {
-      title: "Vieste Concetto",
+      title: "VIESTE CONCETTO — Moda brasileira contemporânea",
       description,
       type: "website",
-      images: [{ url: new URL("/og.png", metadataBase).toString(), width: 1536, height: 1024 }],
+      images: [{ url: new URL("/og.png", metadataBase).toString(), width: 1920, height: 1080 }],
     },
     twitter: {
       card: "summary_large_image",
-      title: "Vieste Concetto",
+      title: "VIESTE CONCETTO — Moda brasileira contemporânea",
       description,
       images: [new URL("/og.png", metadataBase).toString()],
     },

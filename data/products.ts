@@ -1,0 +1,48 @@
+import type { Product } from "@/types/product";
+
+export const products: Product[] = [
+  {
+    name: "Vestido Longo Fluido",
+    category: "Vestidos",
+    color: "Off-white",
+    price: "R$ 890,00",
+    installments: "6x de R$ 148,33 sem juros",
+    image: "/assets/product-1.jpg",
+    secondaryImage: "/assets/feminino.jpg",
+    slug: "vestido-longo-seda-areia",
+    badge: "Novo",
+  },
+  {
+    name: "Conjunto Linho Amplo",
+    category: "Conjuntos",
+    color: "Terracota",
+    price: "R$ 1.180,00",
+    installments: "6x de R$ 196,67 sem juros",
+    image: "/assets/product-2.jpg",
+    secondaryImage: "/assets/hero-3.jpg",
+    slug: "conjunto-linho-terracota",
+    badge: "Novo",
+  },
+  {
+    name: "Vestido Amplo Cintura Marcada",
+    category: "Vestidos",
+    color: "Verde profundo",
+    price: "R$ 960,00",
+    installments: "6x de R$ 160,00 sem juros",
+    image: "/assets/product-3.jpg",
+    secondaryImage: "/assets/campaign-2.jpg",
+    slug: "vestido-verde-profundo",
+    badge: "Novo",
+  },
+  {
+    name: "Tricot Leve & Saia Longa",
+    category: "Conjuntos",
+    color: "Pêssego",
+    price: "R$ 1.290,00",
+    installments: "6x de R$ 215,00 sem juros",
+    image: "/assets/product-4.jpg",
+    secondaryImage: "/assets/product-1.jpg",
+    slug: "tricot-pessego-saia-longa",
+    badge: "Novo",
+  },
+];
