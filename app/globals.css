@@ -112,6 +112,58 @@
     transform: scaleX(1);
     transform-origin: left;
   }
+
+  .button-primary,
+  .button-secondary,
+  .button-light {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color .3s ease, background-color .3s ease, border-color .3s ease;
+  }
+
+  .button-primary {
+    border: 1px solid var(--color-clay);
+    color: white;
+    background: var(--color-clay);
+  }
+
+  .button-primary:hover {
+    border-color: var(--color-graphite);
+    background: var(--color-graphite);
+  }
+
+  .button-secondary {
+    border: 1px solid var(--color-clay);
+    color: var(--color-clay);
+    background: transparent;
+  }
+
+  .button-secondary:hover {
+    color: white;
+    background: var(--color-clay);
+  }
+
+  .button-light {
+    border: 1px solid var(--color-background);
+    color: var(--color-graphite);
+    background: var(--color-background);
+  }
+
+  .button-light:hover {
+    border-color: var(--color-peach);
+    background: var(--color-peach);
+  }
+
+  .scrollbar-hidden {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

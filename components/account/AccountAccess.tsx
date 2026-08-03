@@ -8,6 +8,7 @@ type Feedback = { form: "login" | "register" | "recovery"; message: string } | n
 const inputClass = "mt-2 h-13 w-full border border-border bg-background px-4 text-sm normal-case outline-none transition-colors focus:border-clay";
 
 export function AccountAccess() {
+  const [mode, setMode] = useState<"login" | "register">("login");
   const [feedback, setFeedback] = useState<Feedback>(null);
 
   function submit(event: FormEvent<HTMLFormElement>, form: "login" | "register") {
@@ -20,49 +21,59 @@ export function AccountAccess() {
     });
   }
 
+  function changeMode(nextMode: "login" | "register") {
+    setMode(nextMode);
+    setFeedback(null);
+  }
+
   return (
-    <div className="mx-auto grid max-w-[1200px] gap-8 px-4 py-16 md:grid-cols-2 md:px-10 md:py-24">
-      <section className="border border-border bg-background p-6 md:p-10" aria-labelledby="login-title">
-        <p className="eyebrow text-clay">Já sou cliente</p>
-        <h2 className="mt-3 font-serif text-7xl" id="login-title">Entrar</h2>
-        <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">Acesse seus pedidos, endereços e preferências.</p>
+    <section className="border border-border bg-background shadow-[0_24px_70px_rgba(64,64,64,.08)]" aria-label="Acesso à conta">
+      <div className="grid grid-cols-2 border-b border-border" role="tablist" aria-label="Escolha uma forma de acesso">
+        <button className={`eyebrow relative px-4 py-6 transition-colors ${mode === "login" ? "text-clay" : "text-muted-foreground hover:text-graphite"}`} onClick={() => changeMode("login")} role="tab" aria-selected={mode === "login"} type="button">Entrar<span className={`absolute inset-x-0 bottom-0 h-0.5 bg-clay transition-transform duration-300 ${mode === "login" ? "scale-x-100" : "scale-x-0"}`} /></button>
+        <button className={`eyebrow relative px-4 py-6 transition-colors ${mode === "register" ? "text-clay" : "text-muted-foreground hover:text-graphite"}`} onClick={() => changeMode("register")} role="tab" aria-selected={mode === "register"} type="button">Criar conta<span className={`absolute inset-x-0 bottom-0 h-0.5 bg-clay transition-transform duration-300 ${mode === "register" ? "scale-x-100" : "scale-x-0"}`} /></button>
+      </div>
 
-        <form className="mt-8 space-y-5" onSubmit={(event) => submit(event, "login")}>
-          <label className="block text-xs font-medium uppercase tracking-wider">E-mail
-            <input className={inputClass} autoComplete="email" name="email" required type="email" />
-          </label>
-          <label className="block text-xs font-medium uppercase tracking-wider">Senha
-            <input className={inputClass} autoComplete="current-password" minLength={6} name="password" required type="password" />
-          </label>
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <label className="flex items-center gap-2 text-sm text-muted-foreground"><input className="accent-clay" name="remember" type="checkbox" />Lembrar de mim</label>
-            <button className="text-sm text-clay underline underline-offset-4" onClick={() => setFeedback({ form: "recovery", message: "A recuperação de senha será ativada com a autenticação da loja." })} type="button">Esqueci minha senha</button>
+      <div className="p-6 md:p-10 lg:p-12">
+        {mode === "login" ? (
+          <div role="tabpanel">
+            <p className="eyebrow text-clay">Bem-vinda de volta</p>
+            <h2 className="mt-3 font-serif text-7xl leading-none" id="login-title">Acessar conta</h2>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">Entre para consultar pedidos, endereços e preferências.</p>
+            <form className="mt-9 space-y-5" onSubmit={(event) => submit(event, "login")}>
+              <Field autoComplete="email" label="E-mail" name="email" type="email" />
+              <Field autoComplete="current-password" label="Senha" minLength={6} name="password" type="password" />
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <label className="flex items-center gap-2 text-sm text-muted-foreground"><input className="h-4 w-4 accent-clay" name="remember" type="checkbox" />Lembrar de mim</label>
+                <button className="text-sm text-clay underline underline-offset-4 transition-colors hover:text-graphite" onClick={() => setFeedback({ form: "recovery", message: "A recuperação de senha será ativada com a autenticação da loja." })} type="button">Esqueci minha senha</button>
+              </div>
+              <button className="button-primary eyebrow w-full px-8 py-4" type="submit">Entrar na minha conta</button>
+              {(feedback?.form === "login" || feedback?.form === "recovery") && <FeedbackMessage message={feedback.message} />}
+            </form>
           </div>
-          <button className="eyebrow w-full bg-clay px-8 py-4 text-white transition-colors hover:bg-graphite" type="submit">Entrar na minha conta</button>
-          {(feedback?.form === "login" || feedback?.form === "recovery") && <p className="border-l-2 border-clay pl-3 text-sm leading-relaxed text-clay" role="status">{feedback.message}</p>}
-        </form>
-      </section>
-
-      <section className="bg-peach p-6 text-graphite md:p-10" aria-labelledby="register-title">
-        <p className="eyebrow text-clay">Primeira compra</p>
-        <h2 className="mt-3 font-serif text-7xl text-clay" id="register-title">Criar conta</h2>
-        <p className="mt-3 max-w-md text-sm leading-relaxed">Cadastre-se para tornar sua experiência na Vieste mais simples.</p>
-
-        <form className="mt-8 space-y-5" onSubmit={(event) => submit(event, "register")}>
-          <label className="block text-xs font-medium uppercase tracking-wider">Nome completo
-            <input className={inputClass} autoComplete="name" name="name" required type="text" />
-          </label>
-          <label className="block text-xs font-medium uppercase tracking-wider">E-mail
-            <input className={inputClass} autoComplete="email" name="email" required type="email" />
-          </label>
-          <label className="block text-xs font-medium uppercase tracking-wider">Crie uma senha
-            <input className={inputClass} autoComplete="new-password" minLength={6} name="password" required type="password" />
-          </label>
-          <label className="flex items-start gap-3 text-xs leading-relaxed"><input className="mt-0.5 accent-clay" required type="checkbox" />Li e aceito a Política de Privacidade e os Termos de Uso.</label>
-          <button className="eyebrow w-full bg-forest px-8 py-4 text-white transition-colors hover:bg-graphite" type="submit">Criar minha conta</button>
-          {feedback?.form === "register" && <p className="border-l-2 border-clay pl-3 text-sm leading-relaxed text-clay" role="status">{feedback.message}</p>}
-        </form>
-      </section>
-    </div>
+        ) : (
+          <div role="tabpanel">
+            <p className="eyebrow text-clay">Primeira compra</p>
+            <h2 className="mt-3 font-serif text-7xl leading-none" id="register-title">Criar minha conta</h2>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">Cadastre-se para tornar sua experiência na Vieste mais rápida.</p>
+            <form className="mt-9 space-y-5" onSubmit={(event) => submit(event, "register")}>
+              <Field autoComplete="name" label="Nome completo" name="name" type="text" />
+              <Field autoComplete="email" label="E-mail" name="email" type="email" />
+              <Field autoComplete="new-password" label="Crie uma senha" minLength={6} name="password" type="password" />
+              <label className="flex items-start gap-3 text-xs leading-relaxed text-muted-foreground"><input className="mt-0.5 h-4 w-4 shrink-0 accent-clay" required type="checkbox" />Li e aceito a Política de Privacidade e os Termos de Uso.</label>
+              <button className="button-primary eyebrow w-full px-8 py-4" type="submit">Criar minha conta</button>
+              {feedback?.form === "register" && <FeedbackMessage message={feedback.message} />}
+            </form>
+          </div>
+        )}
+      </div>
+    </section>
   );
+}
+
+function Field({ autoComplete, label, minLength, name, type }: { autoComplete: string; label: string; minLength?: number; name: string; type: string }) {
+  return <label className="block text-xs font-medium uppercase tracking-wider">{label}<input className={inputClass} autoComplete={autoComplete} minLength={minLength} name={name} required type={type} /></label>;
+}
+
+function FeedbackMessage({ message }: { message: string }) {
+  return <p className="border-l-2 border-clay bg-peach-soft px-4 py-3 text-sm leading-relaxed text-clay" role="status">{message}</p>;
 }
