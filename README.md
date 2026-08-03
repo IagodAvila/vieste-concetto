@@ -4,7 +4,20 @@ Reformulação da experiência digital e do e-commerce da **Vieste Concetto**, m
 
 > Projeto real em desenvolvimento. A interface e os fluxos principais já são funcionais; integrações comerciais e operacionais ainda serão conectadas ao ambiente de produção.
 
-![Página inicial da Vieste Concetto](public/og.png)
+## Antes e depois
+
+<table>
+  <tr>
+    <th>Antes</th>
+    <th>Depois</th>
+  </tr>
+  <tr>
+    <td><img src="public/readme/vieste-antes.jpg" alt="Página inicial da Vieste antes da reformulação" /></td>
+    <td><img src="public/readme/vieste-depois.jpg" alt="Página inicial da Vieste depois da reformulação" /></td>
+  </tr>
+</table>
+
+A evolução visual inclui a aplicação do manual da marca, reconstrução vetorial dos logotipos, adoção da paleta oficial, incorporação da Red Velvet e uma hierarquia mais coerente entre navegação, campanha e conteúdo editorial.
 
 ## Sobre o projeto
 
@@ -27,7 +40,9 @@ Os principais objetivos da reformulação são:
 - pesquisa de produtos por nome, categoria e cor;
 - lista de favoritos persistida no navegador;
 - sacola com inclusão, remoção, alteração de quantidade e cálculo do total;
-- painéis de conta, favoritos e sacola;
+- página dedicada de acesso e cadastro de clientes;
+- painéis de favoritos e sacola;
+- acesso às redes oficiais da marca no footer;
 - identidade visual vetorial para manter a qualidade das marcas em qualquer tela;
 - metadados para SEO, Open Graph e compartilhamento em redes sociais;
 - suporte a preferências de redução de movimento.
@@ -39,6 +54,7 @@ Os principais objetivos da reformulação são:
 - [TypeScript](https://www.typescriptlang.org/);
 - [Tailwind CSS 4](https://tailwindcss.com/);
 - otimização de imagens com `next/image`;
+- fontes de marca e logotipos vetoriais servidos localmente;
 - persistência local de favoritos e sacola;
 - configuração adicional para execução em Cloudflare Workers com Vinext.
 
@@ -76,6 +92,7 @@ A aplicação estará disponível em [http://localhost:3000](http://localhost:30
 ```text
 app/                  Rotas, layout, metadados e estilos globais
 components/
+  account/            Acesso e cadastro da área do cliente
   layout/             Header, avisos, navegação e footer
   providers/          Estado compartilhado da experiência de compra
   sections/           Seções editoriais e comerciais da página inicial
