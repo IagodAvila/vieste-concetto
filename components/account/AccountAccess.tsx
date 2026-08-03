@@ -24,7 +24,7 @@ export function AccountAccess() {
     <div className="mx-auto grid max-w-[1200px] gap-8 px-4 py-16 md:grid-cols-2 md:px-10 md:py-24">
       <section className="border border-border bg-background p-6 md:p-10" aria-labelledby="login-title">
         <p className="eyebrow text-clay">Já sou cliente</p>
-        <h2 className="mt-3 font-serif text-4xl" id="login-title">Entrar</h2>
+        <h2 className="mt-3 font-serif text-7xl" id="login-title">Entrar</h2>
         <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">Acesse seus pedidos, endereços e preferências.</p>
 
         <form className="mt-8 space-y-5" onSubmit={(event) => submit(event, "login")}>
@@ -45,7 +45,7 @@ export function AccountAccess() {
 
       <section className="bg-peach p-6 text-graphite md:p-10" aria-labelledby="register-title">
         <p className="eyebrow text-clay">Primeira compra</p>
-        <h2 className="mt-3 font-serif text-4xl text-clay" id="register-title">Criar conta</h2>
+        <h2 className="mt-3 font-serif text-7xl text-clay" id="register-title">Criar conta</h2>
         <p className="mt-3 max-w-md text-sm leading-relaxed">Cadastre-se para tornar sua experiência na Vieste mais simples.</p>
 
         <form className="mt-8 space-y-5" onSubmit={(event) => submit(event, "register")}>

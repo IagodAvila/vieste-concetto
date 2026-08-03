@@ -13,7 +13,7 @@ export function NewArrivals() {
   return (
     <>
       <section className="mx-auto max-w-[1600px] px-4 py-20 md:px-10 md:py-28" id="novidades" aria-labelledby="novidades-title">
-        <div className="flex items-end justify-between gap-6"><div><p className="eyebrow text-clay">Acabou de chegar</p><h2 id="novidades-title" className="mt-3 font-serif text-3xl md:text-4xl">Novidades</h2></div><a href="#novidades" className="eyebrow link-underline hidden md:block">Ver tudo</a></div>
+        <div className="flex items-end justify-between gap-6"><div><p className="eyebrow text-clay">Acabou de chegar</p><h2 id="novidades-title" className="mt-3 font-serif text-6xl md:text-7xl">Novidades</h2></div><a href="#novidades" className="eyebrow link-underline hidden md:block">Ver tudo</a></div>
         <ul className="mt-12 grid grid-cols-2 gap-x-4 gap-y-12 md:gap-x-6 lg:grid-cols-4">
           {products.map((product) => <li key={product.name}><ProductCard product={product} onOpen={() => setSelectedProduct(product)} /></li>)}
         </ul>
@@ -36,11 +36,11 @@ function ProductCard({ product, onOpen }: { product: Product; onOpen: () => void
         <Image src={product.secondaryImage} alt="" aria-hidden width={1000} height={1500} sizes="(min-width:1024px) 25vw, 50vw" className="absolute inset-0 aspect-2/3 h-full w-full object-cover opacity-0 transition-[opacity,transform] duration-[900ms] ease-[cubic-bezier(.22,1,.36,1)] group-hover:opacity-100" />
         {product.badge && <span className="eyebrow absolute top-3 left-3 bg-background/90 px-2 py-1">{product.badge}</span>}
         <button className="absolute inset-0 cursor-zoom-in" onClick={onOpen} type="button" aria-label={`Ampliar fotos e ver detalhes de ${product.name}`} />
-        <button onClick={() => addToCart(product.slug)} className="eyebrow absolute bottom-3 left-3 z-10 hidden translate-y-2 cursor-pointer items-center gap-2 bg-background/95 px-5 py-3 opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-100 md:flex" type="button"><PlusIcon className="h-3.5 w-3.5" />{quantity ? `Na sacola (${quantity})` : "Adicionar à sacola"}</button>
+        <button onClick={() => addToCart(product.slug)} className="eyebrow absolute bottom-3 left-3 z-10 hidden translate-y-2 cursor-pointer items-center gap-2 bg-background/95 px-5 py-3 opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-100 md:flex" type="button"><PlusIcon className="h-3.5 w-3.5" />{quantity ? `Na sacola · ${quantity}` : "Adicionar à sacola"}</button>
       </div>
       <button onClick={() => toggleFavorite(product.slug)} type="button" aria-label={favorite ? `Remover ${product.name} dos favoritos` : `Favoritar ${product.name}`} aria-pressed={favorite} className={`absolute top-2 right-2 z-10 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full transition-colors ${favorite ? "bg-background/80 text-clay" : "hover:text-clay"}`}><HeartIcon className={`h-[18px] w-[18px] ${favorite ? "fill-current" : ""}`} /></button>
       <div className="mt-4 space-y-1"><h3 className="text-[.95rem] leading-snug font-medium"><button className="link-underline cursor-pointer text-left" onClick={onOpen} type="button">{product.name}</button></h3><p className="text-xs tracking-wide text-muted-foreground">{product.category} · {product.color}</p><p className="pt-1 text-sm">{product.price}</p><p className="text-xs text-muted-foreground">{product.installments}</p></div>
-      <button onClick={() => addToCart(product.slug)} className="eyebrow mt-3 w-full border border-border px-3 py-3 md:hidden" type="button">{quantity ? `Na sacola (${quantity})` : "Adicionar à sacola"}</button>
+      <button onClick={() => addToCart(product.slug)} className="eyebrow mt-3 w-full border border-border px-3 py-3 md:hidden" type="button">{quantity ? `Na sacola · ${quantity}` : "Adicionar à sacola"}</button>
     </article>
   );
 }
@@ -114,7 +114,7 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
             </div>
           </div>
           <p className="eyebrow text-clay">{product.category}</p>
-          <h2 id={`product-title-${product.slug}`} className="mt-3 pr-10 font-serif text-3xl">{product.name}</h2>
+          <h2 id={`product-title-${product.slug}`} className="mt-3 pr-10 font-serif text-6xl leading-tight md:text-7xl">{product.name}</h2>
           <p className="mt-2 text-sm text-muted-foreground">{product.color}</p>
           <p className="mt-6 text-lg">{product.price}</p>
           <p className="mt-1 text-xs text-muted-foreground">{product.installments}</p>
