@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 type CartLine = {
   slug: string;
+  size: string;
   quantity: number;
 };
 
@@ -14,9 +15,9 @@ type ShopContextValue = {
   cartCount: number;
   isFavorite: (slug: string) => boolean;
   toggleFavorite: (slug: string) => void;
-  addToCart: (slug: string) => void;
-  removeFromCart: (slug: string) => void;
-  updateQuantity: (slug: string, quantity: number) => void;
+  addToCart: (slug: string, size: string) => void;
+  removeFromCart: (slug: string, size: string) => void;
+  updateQuantity: (slug: string, size: string, quantity: number) => void;
 };
 
 const STORAGE_KEY = "vieste-shop";
@@ -36,7 +37,7 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
         if (stored) {
           const data = JSON.parse(stored) as { favoriteSlugs?: string[]; cart?: CartLine[] };
           setFavoriteSlugs(data.favoriteSlugs ?? []);
-          setCart(data.cart ?? []);
+          setCart((data.cart ?? []).map((line) => ({ ...line, size: line.size ?? "M" })));
         }
       } catch {
         window.localStorage.removeItem(STORAGE_KEY);
@@ -57,12 +58,12 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     cartCount: cart.reduce((total, line) => total + line.quantity, 0),
     isFavorite: (slug) => favoriteSlugs.includes(slug),
     toggleFavorite: (slug) => setFavoriteSlugs((current) => current.includes(slug) ? current.filter((item) => item !== slug) : [...current, slug]),
-    addToCart: (slug) => setCart((current) => {
-      const line = current.find((item) => item.slug === slug);
-      return line ? current.map((item) => item.slug === slug ? { ...item, quantity: item.quantity + 1 } : item) : [...current, { slug, quantity: 1 }];
+    addToCart: (slug, size) => setCart((current) => {
+      const line = current.find((item) => item.slug === slug && item.size === size);
+      return line ? current.map((item) => item.slug === slug && item.size === size ? { ...item, quantity: item.quantity + 1 } : item) : [...current, { slug, size, quantity: 1 }];
     }),
-    removeFromCart: (slug) => setCart((current) => current.filter((item) => item.slug !== slug)),
-    updateQuantity: (slug, quantity) => setCart((current) => quantity <= 0 ? current.filter((item) => item.slug !== slug) : current.map((item) => item.slug === slug ? { ...item, quantity } : item)),
+    removeFromCart: (slug, size) => setCart((current) => current.filter((item) => item.slug !== slug || item.size !== size)),
+    updateQuantity: (slug, size, quantity) => setCart((current) => quantity <= 0 ? current.filter((item) => item.slug !== slug || item.size !== size) : current.map((item) => item.slug === slug && item.size === size ? { ...item, quantity } : item)),
   }), [cart, favoriteSlugs]);
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;

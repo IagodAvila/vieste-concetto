@@ -14,6 +14,7 @@ export const products: Product[] = [
     description: "Vestido longo de caimento fluido, com modelagem ampla e acabamento delicado.",
     composition: "70% viscose, 30% linho. Forro: 100% viscose.",
     measurements: ["P — busto 88 cm · cintura 72 cm · comprimento 138 cm", "M — busto 94 cm · cintura 78 cm · comprimento 140 cm", "G — busto 100 cm · cintura 84 cm · comprimento 142 cm"],
+    sizes: ["P", "M", "G"],
   },
   {
     name: "Conjunto Linho Amplo",
@@ -28,6 +29,7 @@ export const products: Product[] = [
     description: "Conjunto de duas peças com camisa ampla e calça de cintura alta.",
     composition: "55% linho, 45% viscose.",
     measurements: ["P — busto 92 cm · cintura 70 cm · quadril 98 cm", "M — busto 98 cm · cintura 76 cm · quadril 104 cm", "G — busto 104 cm · cintura 82 cm · quadril 110 cm"],
+    sizes: ["P", "M", "G"],
   },
   {
     name: "Vestido Amplo Cintura Marcada",
@@ -42,6 +44,7 @@ export const products: Product[] = [
     description: "Vestido amplo com cintura marcada, decote limpo e saia de movimento leve.",
     composition: "100% viscose certificada. Forro: 100% viscose.",
     measurements: ["P — busto 86 cm · cintura 70 cm · comprimento 136 cm", "M — busto 92 cm · cintura 76 cm · comprimento 138 cm", "G — busto 98 cm · cintura 82 cm · comprimento 140 cm"],
+    sizes: ["P", "M", "G"],
   },
   {
     name: "Tricot Leve & Saia Longa",
@@ -56,5 +59,6 @@ export const products: Product[] = [
     description: "Tricot leve combinado à saia longa de cintura alta e caimento fluido.",
     composition: "Tricot: 70% viscose, 30% poliamida. Saia: 100% viscose.",
     measurements: ["P — busto 84–90 cm · cintura 68 cm · quadril 96 cm", "M — busto 90–96 cm · cintura 74 cm · quadril 102 cm", "G — busto 96–102 cm · cintura 80 cm · quadril 108 cm"],
+    sizes: ["P", "M", "G"],
   },
 ];

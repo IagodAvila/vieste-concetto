@@ -11,4 +11,5 @@ export type Product = {
   description: string;
   composition: string;
   measurements: string[];
+  sizes: string[];
 };

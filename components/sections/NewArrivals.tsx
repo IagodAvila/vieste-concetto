@@ -25,9 +25,24 @@ export function NewArrivals() {
 }
 
 function ProductCard({ product, onOpen }: { product: Product; onOpen: () => void }) {
+  const [selectedSize, setSelectedSize] = useState("");
+  const [sizeError, setSizeError] = useState(false);
   const { addToCart, cart, isFavorite, toggleFavorite } = useShop();
   const favorite = isFavorite(product.slug);
-  const quantity = cart.find((line) => line.slug === product.slug)?.quantity ?? 0;
+  const quantity = cart.filter((line) => line.slug === product.slug).reduce((total, line) => total + line.quantity, 0);
+
+  function selectSize(size: string) {
+    setSelectedSize(size);
+    setSizeError(false);
+  }
+
+  function addSelectedSize() {
+    if (!selectedSize) {
+      setSizeError(true);
+      return;
+    }
+    addToCart(product.slug, selectedSize);
+  }
 
   return (
     <article className="group relative">
@@ -36,11 +51,12 @@ function ProductCard({ product, onOpen }: { product: Product; onOpen: () => void
         <Image src={product.secondaryImage} alt="" aria-hidden width={1000} height={1500} sizes="(min-width:1024px) 25vw, 50vw" className="absolute inset-0 aspect-2/3 h-full w-full object-cover opacity-0 transition-[opacity,transform] duration-[900ms] ease-[cubic-bezier(.22,1,.36,1)] group-hover:opacity-100" />
         {product.badge && <span className="eyebrow absolute top-3 left-3 bg-background/90 px-2 py-1">{product.badge}</span>}
         <button className="absolute inset-0 cursor-zoom-in" onClick={onOpen} type="button" aria-label={`Ampliar fotos e ver detalhes de ${product.name}`} />
-        <button onClick={() => addToCart(product.slug)} className="button-light eyebrow absolute bottom-3 left-3 z-10 hidden translate-y-2 gap-2 px-5 py-3 opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-100 md:flex" type="button"><PlusIcon className="h-3.5 w-3.5" />{quantity ? `Na sacola · ${quantity}` : "Adicionar à sacola"}</button>
+        <button onClick={addSelectedSize} className="button-light eyebrow absolute bottom-3 left-3 z-10 hidden translate-y-2 gap-2 px-5 py-3 opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-100 md:flex" type="button"><PlusIcon className="h-3.5 w-3.5" />{sizeError ? "Escolha o tamanho" : quantity ? `Na sacola · ${quantity}` : "Adicionar à sacola"}</button>
       </div>
       <button onClick={() => toggleFavorite(product.slug)} type="button" aria-label={favorite ? `Remover ${product.name} dos favoritos` : `Favoritar ${product.name}`} aria-pressed={favorite} className={`absolute top-2 right-2 z-10 flex h-11 w-11 cursor-pointer items-center justify-center transition-colors ${favorite ? "text-clay" : "text-graphite hover:text-clay"}`}><HeartIcon className={`h-[20px] w-[20px] ${favorite ? "fill-current" : ""}`} /></button>
       <div className="mt-4 space-y-1"><h3 className="min-h-[2.65rem] text-[.95rem] leading-snug font-medium"><button className="line-clamp-2 cursor-pointer text-left transition-colors hover:text-clay" onClick={onOpen} type="button">{product.name}</button></h3><p className="text-xs tracking-wide text-muted-foreground">{product.category} · {product.color}</p><p className="pt-1 text-sm">{product.price}</p><p className="text-xs text-muted-foreground">{product.installments}</p></div>
-      <button onClick={() => addToCart(product.slug)} className="button-secondary eyebrow mt-3 w-full px-3 py-3 md:hidden" type="button">{quantity ? `Na sacola · ${quantity}` : "Adicionar à sacola"}</button>
+      <SizeSelector error={sizeError} onSelect={selectSize} selected={selectedSize} sizes={product.sizes} compact />
+      <button onClick={addSelectedSize} className="button-secondary eyebrow mt-3 w-full px-3 py-3 md:hidden" type="button">{sizeError ? "Escolha o tamanho" : quantity ? `Na sacola · ${quantity}` : "Adicionar à sacola"}</button>
     </article>
   );
 }
@@ -49,8 +65,10 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
   const [activeImage, setActiveImage] = useState(product.image);
   const [zoomed, setZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
+  const [selectedSize, setSelectedSize] = useState("");
+  const [sizeError, setSizeError] = useState(false);
   const { addToCart, cart } = useShop();
-  const quantity = cart.find((line) => line.slug === product.slug)?.quantity ?? 0;
+  const quantity = cart.filter((line) => line.slug === product.slug).reduce((total, line) => total + line.quantity, 0);
   const gallery = [product.image, product.secondaryImage];
 
   useEffect(() => {
@@ -118,6 +136,7 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
           <p className="mt-2 text-sm text-muted-foreground">{product.color}</p>
           <p className="mt-6 text-lg">{product.price}</p>
           <p className="mt-1 text-xs text-muted-foreground">{product.installments}</p>
+          <SizeSelector error={sizeError} onSelect={(size) => { setSelectedSize(size); setSizeError(false); }} selected={selectedSize} sizes={product.sizes} />
           <p className="mt-7 text-sm leading-relaxed">{product.description}</p>
 
           <div className="mt-8 border-t border-border pt-6">
@@ -130,8 +149,22 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
             <p className="mt-3 text-xs text-muted-foreground">As medidas podem variar até 2 cm.</p>
           </div>
 
-          <button onClick={() => addToCart(product.slug)} className="button-primary eyebrow mt-8 w-full px-8 py-4" type="button">{quantity ? `Adicionar mais uma · ${quantity} na sacola` : "Adicionar à sacola"}</button>
+          <button onClick={() => { if (!selectedSize) { setSizeError(true); return; } addToCart(product.slug, selectedSize); }} className="button-primary eyebrow mt-8 w-full px-8 py-4" type="button">{sizeError ? "Selecione um tamanho" : quantity ? `Adicionar mais uma · ${quantity} na sacola` : "Adicionar à sacola"}</button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function SizeSelector({ compact = false, error, onSelect, selected, sizes }: { compact?: boolean; error: boolean; onSelect: (size: string) => void; selected: string; sizes: string[] }) {
+  return (
+    <div className={compact ? "mt-4" : "mt-7"}>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[.68rem] font-medium tracking-[.14em] uppercase">Tamanho</p>
+        {error && <p className="text-[.68rem] text-clay" role="alert">Selecione uma opção</p>}
+      </div>
+      <div className="mt-2 flex gap-2">
+        {sizes.map((size) => <button key={size} className={`${compact ? "h-9 min-w-9 text-xs" : "h-11 min-w-11 text-sm"} border px-2 transition-colors ${selected === size ? "border-clay bg-clay text-white" : error ? "border-clay text-clay" : "border-border hover:border-clay hover:text-clay"}`} onClick={() => onSelect(size)} type="button" aria-pressed={selected === size} aria-label={`Selecionar tamanho ${size}`}>{size}</button>)}
       </div>
     </div>
   );
