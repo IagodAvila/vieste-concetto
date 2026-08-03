@@ -14,7 +14,7 @@ export function Lines() {
       <div className="bg-forest" id="uomo">
         <Image src="/assets/uomo.jpg" alt="Modelo masculino em camisa de linho verde em arquitetura litorânea" width={1600} height={1200} sizes="(min-width:768px) 50vw, 100vw" className="h-[46vh] w-full object-cover md:h-[54vh]" />
         <div className="flex flex-col items-start gap-5 p-8 md:h-[32vh] md:justify-center md:p-12">
-          <Image src="/assets/logo-uomo-light.png" alt="VIESTE CONCETTO UOMO" width={320} height={180} className="h-16 w-auto object-contain md:h-20" />
+          <Image src="/assets/logo-uomo-light.png" alt="VIESTE CONCETTO UOMO" width={320} height={180} className="h-32 w-auto object-contain md:h-36" />
           <p className="max-w-sm text-sm text-white/85">Linho, tricot e alfaiataria leve em uma paleta sóbria. A divisão masculina da casa.</p>
           <a className="eyebrow bg-white px-8 py-3.5 text-forest transition-colors hover:bg-peach hover:text-graphite" href="#uomo">Ver UOMO</a>
         </div>

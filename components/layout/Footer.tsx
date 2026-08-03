@@ -12,7 +12,7 @@ export function Footer() {
       <div className="mx-auto max-w-[1600px] px-4 py-16 md:px-10">
         <div className="grid gap-12 md:grid-cols-[1.2fr_repeat(3,1fr)]">
           <div>
-            <Image src="/assets/logo-vieste.png" alt="VIESTE CONCETTO" width={320} height={180} className="h-10 w-auto object-contain" />
+            <Image src="/assets/logo-vieste.svg" alt="VIESTE CONCETTO" width={1098} height={423} className="h-auto w-[10.5rem]" />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-muted-foreground">Moda brasileira contemporânea. Peças de forma precisa e matérias que acolhem o corpo.</p>
             <div className="mt-6 flex gap-3"><SocialLink label="Instagram">◎</SocialLink><SocialLink label="WhatsApp">◯</SocialLink></div>
           </div>
