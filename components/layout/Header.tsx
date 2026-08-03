@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import type { FormEvent, ReactNode } from "react";
+import Link from "next/link";
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useShop } from "@/components/providers/ShopProvider";
 import { BagIcon, CloseIcon, HeartIcon, MenuIcon, SearchIcon, UserIcon } from "@/components/ui/Icons";
 import { products } from "@/data/products";
 
-type Overlay = "menu" | "search" | "account" | "favorites" | "cart" | null;
+type Overlay = "menu" | "search" | "favorites" | "cart" | null;
 
 const navItems = ["Novidades", "Feminino", "UOMO"];
 const collections = ["Movimento 01", "Movimento 02", "Essenciais", "UOMO 01"];
@@ -15,7 +16,6 @@ const collections = ["Movimento 01", "Movimento 02", "Essenciais", "UOMO 01"];
 export function Header() {
   const [overlay, setOverlay] = useState<Overlay>(null);
   const [query, setQuery] = useState("");
-  const [accountMessage, setAccountMessage] = useState("");
   const [checkoutMessage, setCheckoutMessage] = useState("");
   const { addToCart, cart, cartCount, favoriteCount, favoriteSlugs, removeFromCart, toggleFavorite, updateQuantity } = useShop();
 
@@ -41,11 +41,6 @@ export function Header() {
     setCheckoutMessage("");
   }
 
-  function submitAccount(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setAccountMessage("Área demonstrativa: a autenticação será conectada ao backend da loja.");
-  }
-
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
@@ -61,13 +56,13 @@ export function Header() {
           </nav>
           <Action label="Abrir menu" className="flex justify-self-start lg:hidden" onClick={() => setOverlay("menu")}><MenuIcon className="h-5 w-5" /></Action>
 
-          <a className="justify-self-center" href="#top" aria-label="VIESTE CONCETTO — página inicial">
+          <Link className="justify-self-center" href="/" aria-label="VIESTE CONCETTO — página inicial">
             <Image priority src="/assets/logo-vieste.svg" alt="VIESTE CONCETTO" width={1098} height={423} className="h-auto w-[clamp(7rem,12vw,10.5rem)]" />
-          </a>
+          </Link>
 
           <div className="flex items-center justify-end gap-1 md:gap-2">
             <Action label="Buscar" onClick={() => setOverlay("search")}><SearchIcon className="h-[19px] w-[19px]" /></Action>
-            <Action label="Minha conta" className="hidden sm:flex" onClick={() => setOverlay("account")}><UserIcon className="h-[19px] w-[19px]" /></Action>
+            <Link aria-label="Minha conta" href="/minha-conta" className="hidden h-11 w-11 items-center justify-center transition-colors hover:text-clay sm:flex"><UserIcon className="h-[19px] w-[19px]" /></Link>
             <Action label={`Favoritos (${favoriteCount})`} className="relative hidden sm:flex" onClick={() => setOverlay("favorites")}><HeartIcon className={`h-[19px] w-[19px] ${favoriteCount ? "fill-current text-clay" : ""}`} />{favoriteCount > 0 && <CountBadge count={favoriteCount} />}</Action>
             <Action label={`Abrir sacola (${cartCount} itens)`} className="relative" onClick={() => setOverlay("cart")}><BagIcon className="h-[19px] w-[19px]" />{cartCount > 0 && <CountBadge count={cartCount} />}</Action>
           </div>
@@ -82,7 +77,7 @@ export function Header() {
           {[...navItems, "Nossa história", "Contato"].map((item) => <a onClick={closeOverlay} className="block py-3 font-serif text-3xl" href={`#${item.toLowerCase().replaceAll(" ", "-")}`} key={item}>{item}</a>)}
           <p className="eyebrow mt-10 text-clay">Coleções</p>
           <div className="mt-4 space-y-1 border-t border-clay/20 pt-4">{collections.map((item) => <a onClick={closeOverlay} className="block py-1.5 text-sm" href="#campanha" key={item}>{item}</a>)}</div>
-          <div className="mt-10 grid grid-cols-2 gap-3 border-t border-clay/20 py-6"><button onClick={() => setOverlay("account")} className="flex items-center gap-2 py-2 text-sm"><UserIcon className="h-4 w-4" />Minha conta</button><button onClick={() => setOverlay("favorites")} className="flex items-center gap-2 py-2 text-sm"><HeartIcon className="h-4 w-4" />Favoritos ({favoriteCount})</button></div>
+          <div className="mt-10 grid grid-cols-2 gap-3 border-t border-clay/20 py-6"><Link onClick={closeOverlay} href="/minha-conta" className="flex items-center gap-2 py-2 text-sm"><UserIcon className="h-4 w-4" />Minha conta</Link><button onClick={() => setOverlay("favorites")} className="flex items-center gap-2 py-2 text-sm"><HeartIcon className="h-4 w-4" />Favoritos ({favoriteCount})</button></div>
         </nav>
       </aside>
 
@@ -98,9 +93,6 @@ export function Header() {
         <div className="mx-auto max-w-[1600px] px-4 py-4 md:px-10"><div className="flex h-11 items-center gap-4 md:h-[4.05rem]"><SearchIcon className="h-[18px] w-[18px] text-muted-foreground" /><label className="sr-only" htmlFor="site-search">Buscar produtos</label><input value={query} onChange={(event) => setQuery(event.target.value)} autoFocus={overlay === "search"} id="site-search" className="flex-1 bg-transparent font-serif text-xl outline-none placeholder:text-muted-foreground md:text-2xl" placeholder="Buscar por peça, categoria ou cor" /><CloseButton onClick={closeOverlay} label="Fechar busca" /></div>{query.trim() && <div className="grid max-h-[55vh] gap-3 overflow-y-auto border-t border-border pt-5 sm:grid-cols-2 lg:grid-cols-4">{searchResults.length ? searchResults.map((product) => <button onClick={() => { closeOverlay(); document.getElementById("novidades")?.scrollIntoView({ behavior: "smooth" }); }} className="flex gap-3 p-2 text-left transition-colors hover:bg-secondary" key={product.slug}><Image src={product.image} alt="" width={64} height={90} className="h-20 w-14 object-cover" /><span><strong className="block text-sm font-medium">{product.name}</strong><small className="mt-1 block text-muted-foreground">{product.category} · {product.color}</small><small className="mt-2 block">{product.price}</small></span></button>) : <p className="py-5 text-sm text-muted-foreground">Nenhuma peça encontrada para “{query}”.</p>}</div>}</div>
       </div>
 
-      <div className={`fixed top-1/2 left-1/2 z-60 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 bg-background p-7 shadow-xl transition-[opacity,transform] duration-300 ${overlay === "account" ? "scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0"}`} aria-hidden={overlay !== "account"} role="dialog" aria-label="Minha conta">
-        <div className="flex items-center justify-between"><h2 className="font-serif text-3xl">Minha conta</h2><CloseButton onClick={closeOverlay} label="Fechar conta" /></div><p className="mt-3 text-sm text-muted-foreground">Entre para acompanhar pedidos e salvar seus favoritos.</p><form onSubmit={submitAccount} className="mt-6 space-y-4"><label className="block text-xs uppercase tracking-wider">E-mail<input required type="email" className="mt-2 h-12 w-full border border-border px-3 text-sm normal-case outline-none focus:border-clay" /></label><label className="block text-xs uppercase tracking-wider">Senha<input required minLength={6} type="password" className="mt-2 h-12 w-full border border-border px-3 text-sm normal-case outline-none focus:border-clay" /></label><button type="submit" className="eyebrow w-full bg-clay px-8 py-4 text-white hover:bg-graphite">Entrar</button></form>{accountMessage && <p className="mt-4 text-xs text-clay" role="status">{accountMessage}</p>}
-      </div>
     </>
   );
 }

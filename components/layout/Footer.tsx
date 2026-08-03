@@ -1,4 +1,6 @@
 import Image from "next/image";
+import type { ReactNode } from "react";
+import { FacebookIcon, InstagramIcon } from "@/components/ui/Icons";
 
 const groups = [
   { title: "Atendimento", links: ["Fale com a gente", "Minha conta", "Guia de medidas"] },
@@ -14,7 +16,10 @@ export function Footer() {
           <div>
             <Image src="/assets/logo-vieste.svg" alt="VIESTE CONCETTO" width={1098} height={423} className="h-auto w-[10.5rem]" />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-muted-foreground">Moda brasileira contemporânea. Peças de forma precisa e matérias que acolhem o corpo.</p>
-            <div className="mt-6 flex gap-3"><SocialLink label="Instagram">◎</SocialLink><SocialLink label="WhatsApp">◯</SocialLink></div>
+            <div className="mt-6 flex gap-3">
+              <SocialLink href="https://www.facebook.com/viesteconcetto" label="Facebook"><FacebookIcon className="h-5 w-5" /></SocialLink>
+              <SocialLink href="https://www.instagram.com/viesteconcetto?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" label="Instagram"><InstagramIcon className="h-5 w-5" /></SocialLink>
+            </div>
           </div>
           {groups.map((group) => <nav aria-label={group.title} key={group.title}><h2 className="eyebrow text-clay">{group.title}</h2><ul className="mt-5 space-y-3">{group.links.map((link) => <li key={link}><a className="link-underline text-sm" href="#">{link}</a></li>)}</ul></nav>)}
         </div>
@@ -27,6 +32,6 @@ export function Footer() {
   );
 }
 
-function SocialLink({ label, children }: { label: string; children: string }) {
-  return <a href="#" aria-label={label} className="flex h-11 w-11 items-center justify-center border border-border text-lg transition-colors hover:border-clay hover:text-clay">{children}</a>;
+function SocialLink({ children, href, label }: { children: ReactNode; href: string; label: string }) {
+  return <a href={href} target="_blank" rel="noreferrer" aria-label={`${label} da Vieste — abre em nova aba`} className="flex h-11 w-11 items-center justify-center border border-border transition-colors hover:border-clay hover:text-clay">{children}</a>;
 }
