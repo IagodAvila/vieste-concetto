@@ -5,14 +5,13 @@ import { FacebookIcon, InstagramIcon } from "@/components/ui/Icons";
 const groups = [
   { title: "Atendimento", links: ["Fale com a gente", "Minha conta", "Guia de medidas"] },
   { title: "Ajuda", links: ["Trocas e devoluções", "Envios e entregas", "Política de privacidade"] },
-  { title: "A marca", links: ["Nossa história", "Novidades", "UOMO"] },
 ];
 
 export function Footer() {
   return (
     <footer className="border-t border-border bg-sand-deep">
       <div className="mx-auto max-w-[1600px] px-4 py-16 md:px-10">
-        <div className="grid gap-12 md:grid-cols-[1.2fr_repeat(3,1fr)]">
+        <div className="grid gap-12 md:grid-cols-[1.4fr_repeat(2,1fr)]">
           <div>
             <Image src="/assets/logo-vieste.svg" alt="VIESTE CONCETTO" width={1098} height={423} className="h-auto w-[10.5rem]" />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-muted-foreground">Moda brasileira contemporânea. Peças de forma precisa e matérias que acolhem o corpo.</p>

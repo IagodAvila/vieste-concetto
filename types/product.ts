@@ -8,4 +8,7 @@ export type Product = {
   secondaryImage: string;
   slug: string;
   badge?: string;
+  description: string;
+  composition: string;
+  measurements: string[];
 };

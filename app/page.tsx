@@ -6,7 +6,6 @@ import { Campaign } from "@/components/sections/Campaign";
 import { Editorial } from "@/components/sections/Editorial";
 import { Hero } from "@/components/sections/Hero";
 import { Lines } from "@/components/sections/Lines";
-import { Manifesto } from "@/components/sections/Manifesto";
 import { Newsletter } from "@/components/sections/Newsletter";
 import { NewArrivals } from "@/components/sections/NewArrivals";
 
@@ -19,7 +18,6 @@ export default function Home() {
       <NewArrivals />
       <Lines />
       <Campaign />
-      <Manifesto />
       <Benefits />
       <Editorial />
       <Newsletter />

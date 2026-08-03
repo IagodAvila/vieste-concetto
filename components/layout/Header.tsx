@@ -10,8 +10,8 @@ import { products } from "@/data/products";
 
 type Overlay = "menu" | "search" | "favorites" | "cart" | null;
 
-const navItems = ["Novidades", "Feminino", "UOMO"];
-const collections = ["Movimento 01", "Movimento 02", "Essenciais", "UOMO 01"];
+const navItems = ["Novidades", "Feminino"];
+const collections = ["Movimento 01", "Movimento 02", "Essenciais"];
 
 export function Header() {
   const [overlay, setOverlay] = useState<Overlay>(null);
@@ -74,7 +74,7 @@ export function Header() {
       <aside className={`fixed inset-0 z-60 flex flex-col bg-peach-soft transition-[opacity,transform] duration-500 lg:hidden ${overlay === "menu" ? "translate-x-0 opacity-100" : "pointer-events-none -translate-x-4 opacity-0"}`} aria-hidden={overlay !== "menu"} aria-label="Menu">
         <PanelHeader logo title="" close={closeOverlay} closeLabel="Fechar menu" />
         <nav className="flex-1 overflow-y-auto px-6 pt-6">
-          {[...navItems, "Nossa história", "Contato"].map((item) => <a onClick={closeOverlay} className="block py-3 font-serif text-3xl" href={`#${item.toLowerCase().replaceAll(" ", "-")}`} key={item}>{item}</a>)}
+          {[...navItems, "Contato"].map((item) => <a onClick={closeOverlay} className="block py-3 font-serif text-3xl" href={`#${item.toLowerCase().replaceAll(" ", "-")}`} key={item}>{item}</a>)}
           <p className="eyebrow mt-10 text-clay">Coleções</p>
           <div className="mt-4 space-y-1 border-t border-clay/20 pt-4">{collections.map((item) => <a onClick={closeOverlay} className="block py-1.5 text-sm" href="#campanha" key={item}>{item}</a>)}</div>
           <div className="mt-10 grid grid-cols-2 gap-3 border-t border-clay/20 py-6"><Link onClick={closeOverlay} href="/minha-conta" className="flex items-center gap-2 py-2 text-sm"><UserIcon className="h-4 w-4" />Minha conta</Link><button onClick={() => setOverlay("favorites")} className="flex items-center gap-2 py-2 text-sm"><HeartIcon className="h-4 w-4" />Favoritos ({favoriteCount})</button></div>

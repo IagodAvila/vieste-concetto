@@ -4,7 +4,7 @@ const images = [
   { src: "/assets/hero-3.jpg", alt: "Editorial em dunas ao fim da tarde", className: "h-[52vh]" },
   { src: "/assets/campaign-1.jpg", alt: "Detalhe de tecido terracota", className: "h-[40vh] self-end" },
   { src: "/assets/feminino.jpg", alt: "Vestido de tricot em luz natural", className: "h-[52vh]" },
-  { src: "/assets/uomo.jpg", alt: "Editorial UOMO em arquitetura litorânea", className: "h-[44vh] self-end" },
+  { src: "/assets/campaign-2.jpg", alt: "Vestido verde em movimento junto à costa", className: "h-[44vh] self-end" },
   { src: "/assets/hero-2.jpg", alt: "Vestido pêssego junto a parede branca", className: "h-[52vh]" },
 ];
 

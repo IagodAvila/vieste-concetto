@@ -8,7 +8,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = requestHeaders.get("host") ?? "localhost:3000";
   const protocol = host.startsWith("localhost") ? "http" : "https";
   const metadataBase = new URL(`${protocol}://${host}`);
-  const description = "Coleções de forma precisa e matérias que acolhem o corpo. Feminino e UOMO, com envio para todo o Brasil.";
+  const description = "Moda feminina brasileira contemporânea, com formas precisas e matérias que acolhem o corpo. Envio para todo o Brasil.";
 
   return {
     metadataBase,
