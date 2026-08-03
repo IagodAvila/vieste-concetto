@@ -1,20 +1,50 @@
 "use client";
 
 import Image from "next/image";
-import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import type { FormEvent, ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useShop } from "@/components/providers/ShopProvider";
 import { BagIcon, CloseIcon, HeartIcon, MenuIcon, SearchIcon, UserIcon } from "@/components/ui/Icons";
+import { products } from "@/data/products";
+
+type Overlay = "menu" | "search" | "account" | "favorites" | "cart" | null;
 
 const navItems = ["Novidades", "Feminino", "UOMO"];
 const collections = ["Movimento 01", "Movimento 02", "Essenciais", "UOMO 01"];
 
 export function Header() {
-  const [overlay, setOverlay] = useState<"menu" | "search" | "cart" | null>(null);
+  const [overlay, setOverlay] = useState<Overlay>(null);
+  const [query, setQuery] = useState("");
+  const [accountMessage, setAccountMessage] = useState("");
+  const [checkoutMessage, setCheckoutMessage] = useState("");
+  const { addToCart, cart, cartCount, favoriteCount, favoriteSlugs, removeFromCart, toggleFavorite, updateQuantity } = useShop();
+
+  const favoriteProducts = products.filter((product) => favoriteSlugs.includes(product.slug));
+  const cartLines = cart.flatMap((line) => {
+    const product = products.find((item) => item.slug === line.slug);
+    return product ? [{ ...line, product }] : [];
+  });
+  const cartTotal = cartLines.reduce((total, line) => total + parsePrice(line.product.price) * line.quantity, 0);
+  const searchResults = useMemo(() => {
+    const term = query.trim().toLocaleLowerCase("pt-BR");
+    if (!term) return [];
+    return products.filter((product) => [product.name, product.category, product.color].some((value) => value.toLocaleLowerCase("pt-BR").includes(term)));
+  }, [query]);
 
   useEffect(() => {
     document.body.style.overflow = overlay ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [overlay]);
+
+  function closeOverlay() {
+    setOverlay(null);
+    setCheckoutMessage("");
+  }
+
+  function submitAccount(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setAccountMessage("Área demonstrativa: a autenticação será conectada ao backend da loja.");
+  }
 
   return (
     <>
@@ -24,12 +54,12 @@ export function Header() {
             {navItems.map((item) => <a className="eyebrow link-underline" href={`#${item.toLowerCase()}`} key={item}>{item}</a>)}
             <div className="group relative">
               <button className="eyebrow link-underline cursor-pointer border-0 bg-transparent" type="button">Coleções</button>
-              <div className="pointer-events-none absolute top-full left-0 w-56 translate-y-1 border border-border bg-background pt-4 pb-3 opacity-0 transition duration-300 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
+              <div className="pointer-events-none absolute top-full left-0 w-56 translate-y-1 border border-border bg-background pt-4 pb-3 opacity-0 shadow-sm transition duration-300 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
                 {collections.map((item) => <a className="block px-5 py-2 text-sm transition-colors hover:bg-secondary" href="#campanha" key={item}>{item}</a>)}
               </div>
             </div>
           </nav>
-          <button onClick={() => setOverlay("menu")} className="flex h-11 w-11 items-center justify-center justify-self-start text-graphite lg:hidden" type="button" aria-label="Abrir menu"><MenuIcon className="h-5 w-5" /></button>
+          <Action label="Abrir menu" className="flex justify-self-start lg:hidden" onClick={() => setOverlay("menu")}><MenuIcon className="h-5 w-5" /></Action>
 
           <a className="justify-self-center" href="#top" aria-label="VIESTE CONCETTO — página inicial">
             <Image priority src="/assets/logo-vieste.png" alt="VIESTE CONCETTO" width={320} height={180} className="h-9 w-auto object-contain md:h-11" />
@@ -37,43 +67,50 @@ export function Header() {
 
           <div className="flex items-center justify-end gap-1 md:gap-2">
             <Action label="Buscar" onClick={() => setOverlay("search")}><SearchIcon className="h-[19px] w-[19px]" /></Action>
-            <a className="hidden h-11 w-11 items-center justify-center transition-colors hover:text-clay sm:flex" href="#conta" aria-label="Minha conta"><UserIcon className="h-[19px] w-[19px]" /></a>
-            <a className="hidden h-11 w-11 items-center justify-center transition-colors hover:text-clay sm:flex" href="#favoritos" aria-label="Favoritos (0)"><HeartIcon className="h-[19px] w-[19px]" /></a>
-            <Action label="Abrir sacola (0 itens)" onClick={() => setOverlay("cart")}><BagIcon className="h-[19px] w-[19px]" /></Action>
+            <Action label="Minha conta" className="hidden sm:flex" onClick={() => setOverlay("account")}><UserIcon className="h-[19px] w-[19px]" /></Action>
+            <Action label={`Favoritos (${favoriteCount})`} className="relative hidden sm:flex" onClick={() => setOverlay("favorites")}><HeartIcon className={`h-[19px] w-[19px] ${favoriteCount ? "fill-current text-clay" : ""}`} />{favoriteCount > 0 && <CountBadge count={favoriteCount} />}</Action>
+            <Action label={`Abrir sacola (${cartCount} itens)`} className="relative" onClick={() => setOverlay("cart")}><BagIcon className="h-[19px] w-[19px]" />{cartCount > 0 && <CountBadge count={cartCount} />}</Action>
           </div>
         </div>
       </header>
 
-      <div onClick={() => setOverlay(null)} className={`fixed inset-0 z-50 bg-graphite/35 transition-opacity duration-500 ${overlay ? "opacity-100" : "pointer-events-none opacity-0"}`} />
+      <button aria-label="Fechar painel" onClick={closeOverlay} className={`fixed inset-0 z-50 bg-graphite/35 transition-opacity duration-500 ${overlay ? "opacity-100" : "pointer-events-none opacity-0"}`} />
 
       <aside className={`fixed inset-0 z-60 flex flex-col bg-peach-soft transition-[opacity,transform] duration-500 lg:hidden ${overlay === "menu" ? "translate-x-0 opacity-100" : "pointer-events-none -translate-x-4 opacity-0"}`} aria-hidden={overlay !== "menu"} aria-label="Menu">
-        <div className="flex items-center justify-between px-4 py-4">
-          <Image src="/assets/logo-vieste.png" alt="VIESTE CONCETTO" width={320} height={180} className="h-8 w-auto" />
-          <CloseButton onClick={() => setOverlay(null)} label="Fechar menu" />
-        </div>
+        <PanelHeader logo title="" close={closeOverlay} closeLabel="Fechar menu" />
         <nav className="flex-1 overflow-y-auto px-6 pt-6">
-          {[...navItems, "Nossa história", "Contato"].map((item) => <a onClick={() => setOverlay(null)} className="block py-3 font-serif text-3xl" href={`#${item.toLowerCase().replaceAll(" ", "-")}`} key={item}>{item}</a>)}
+          {[...navItems, "Nossa história", "Contato"].map((item) => <a onClick={closeOverlay} className="block py-3 font-serif text-3xl" href={`#${item.toLowerCase().replaceAll(" ", "-")}`} key={item}>{item}</a>)}
           <p className="eyebrow mt-10 text-clay">Coleções</p>
-          <div className="mt-4 space-y-1 border-t border-clay/20 pt-4">{collections.map((item) => <a onClick={() => setOverlay(null)} className="block py-1.5 text-sm" href="#campanha" key={item}>{item}</a>)}</div>
+          <div className="mt-4 space-y-1 border-t border-clay/20 pt-4">{collections.map((item) => <a onClick={closeOverlay} className="block py-1.5 text-sm" href="#campanha" key={item}>{item}</a>)}</div>
+          <div className="mt-10 grid grid-cols-2 gap-3 border-t border-clay/20 py-6"><button onClick={() => setOverlay("account")} className="flex items-center gap-2 py-2 text-sm"><UserIcon className="h-4 w-4" />Minha conta</button><button onClick={() => setOverlay("favorites")} className="flex items-center gap-2 py-2 text-sm"><HeartIcon className="h-4 w-4" />Favoritos ({favoriteCount})</button></div>
         </nav>
       </aside>
 
-      <aside className={`fixed top-0 right-0 z-60 flex h-dvh w-full max-w-[420px] flex-col bg-background transition-transform duration-500 ${overlay === "cart" ? "translate-x-0" : "pointer-events-none translate-x-full"}`} aria-hidden={overlay !== "cart"} aria-label="Sacola">
-        <div className="flex items-center justify-between border-b border-border px-5 py-4"><h2 className="eyebrow">Sacola (0)</h2><CloseButton onClick={() => setOverlay(null)} label="Fechar sacola" /></div>
-        <div className="flex flex-1 flex-col items-center justify-center gap-5 px-8 text-center"><p className="font-serif text-2xl">Sua sacola está vazia.</p><p className="text-sm text-muted-foreground">Descubra as peças que acabaram de chegar.</p><a onClick={() => setOverlay(null)} className="eyebrow bg-clay px-8 py-4 text-white transition-colors hover:bg-graphite" href="#novidades">Ver novidades</a></div>
-      </aside>
+      <SidePanel open={overlay === "favorites"} title={`Favoritos (${favoriteCount})`} close={closeOverlay} label="Favoritos">
+        {favoriteProducts.length ? <div className="divide-y divide-border">{favoriteProducts.map((product) => <ProductLine key={product.slug} product={product} actionLabel="Adicionar à sacola" onAction={() => addToCart(product.slug)} onRemove={() => toggleFavorite(product.slug)} />)}</div> : <EmptyPanel title="Você ainda não favoritou nenhuma peça." text="Toque no coração de um produto para guardá-lo aqui." close={closeOverlay} />}
+      </SidePanel>
+
+      <SidePanel open={overlay === "cart"} title={`Sacola (${cartCount})`} close={closeOverlay} label="Sacola">
+        {cartLines.length ? <><div className="flex-1 divide-y divide-border overflow-y-auto">{cartLines.map(({ product, quantity }) => <div className="flex gap-4 py-5" key={product.slug}><Image src={product.image} alt="" width={90} height={130} className="h-[120px] w-20 object-cover" /><div className="flex flex-1 flex-col"><p className="text-sm font-medium">{product.name}</p><p className="mt-1 text-xs text-muted-foreground">{product.color}</p><p className="mt-2 text-sm">{product.price}</p><div className="mt-auto flex items-center justify-between"><div className="flex items-center border border-border"><button onClick={() => updateQuantity(product.slug, quantity - 1)} className="h-8 w-8" aria-label={`Diminuir quantidade de ${product.name}`}>−</button><span className="min-w-7 text-center text-xs">{quantity}</span><button onClick={() => updateQuantity(product.slug, quantity + 1)} className="h-8 w-8" aria-label={`Aumentar quantidade de ${product.name}`}>+</button></div><button onClick={() => removeFromCart(product.slug)} className="text-xs text-muted-foreground underline">Remover</button></div></div></div>)}</div><div className="border-t border-border pt-5"><div className="flex justify-between font-medium"><span>Total</span><span>{formatPrice(cartTotal)}</span></div><p className="mt-1 text-xs text-muted-foreground">Frete calculado na próxima etapa.</p><button onClick={() => setCheckoutMessage("Checkout demonstrativo: falta conectar o meio de pagamento.")} className="eyebrow mt-5 w-full bg-clay px-8 py-4 text-white transition-colors hover:bg-graphite">Finalizar compra</button>{checkoutMessage && <p className="mt-3 text-center text-xs text-clay" role="status">{checkoutMessage}</p>}</div></> : <EmptyPanel title="Sua sacola está vazia." text="Descubra as peças que acabaram de chegar." close={closeOverlay} />}
+      </SidePanel>
 
       <div className={`fixed inset-x-0 top-0 z-60 border-b border-border bg-background transition-[opacity,transform] duration-500 ${overlay === "search" ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-4 opacity-0"}`} aria-hidden={overlay !== "search"}>
-        <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-10"><div className="flex items-center gap-4 border-b border-border pb-3"><SearchIcon className="h-[18px] w-[18px] text-muted-foreground" /><label className="sr-only" htmlFor="site-search">Buscar produtos</label><input autoFocus={overlay === "search"} id="site-search" className="flex-1 bg-transparent font-serif text-xl outline-none placeholder:text-muted-foreground md:text-2xl" placeholder="Buscar por peça, categoria ou coleção" /><CloseButton onClick={() => setOverlay(null)} label="Fechar busca" /></div></div>
+        <div className="mx-auto max-w-[1600px] px-4 py-6 md:px-10"><div className="flex items-center gap-4 border-b border-border pb-3"><SearchIcon className="h-[18px] w-[18px] text-muted-foreground" /><label className="sr-only" htmlFor="site-search">Buscar produtos</label><input value={query} onChange={(event) => setQuery(event.target.value)} autoFocus={overlay === "search"} id="site-search" className="flex-1 bg-transparent font-serif text-xl outline-none placeholder:text-muted-foreground md:text-2xl" placeholder="Buscar por peça, categoria ou cor" /><CloseButton onClick={closeOverlay} label="Fechar busca" /></div>{query.trim() && <div className="grid max-h-[55vh] gap-3 overflow-y-auto pt-5 sm:grid-cols-2 lg:grid-cols-4">{searchResults.length ? searchResults.map((product) => <button onClick={() => { closeOverlay(); document.getElementById("novidades")?.scrollIntoView({ behavior: "smooth" }); }} className="flex gap-3 p-2 text-left transition-colors hover:bg-secondary" key={product.slug}><Image src={product.image} alt="" width={64} height={90} className="h-20 w-14 object-cover" /><span><strong className="block text-sm font-medium">{product.name}</strong><small className="mt-1 block text-muted-foreground">{product.category} · {product.color}</small><small className="mt-2 block">{product.price}</small></span></button>) : <p className="py-5 text-sm text-muted-foreground">Nenhuma peça encontrada para “{query}”.</p>}</div>}</div>
+      </div>
+
+      <div className={`fixed top-1/2 left-1/2 z-60 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 bg-background p-7 shadow-xl transition-[opacity,transform] duration-300 ${overlay === "account" ? "scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0"}`} aria-hidden={overlay !== "account"} role="dialog" aria-label="Minha conta">
+        <div className="flex items-center justify-between"><h2 className="font-serif text-3xl">Minha conta</h2><CloseButton onClick={closeOverlay} label="Fechar conta" /></div><p className="mt-3 text-sm text-muted-foreground">Entre para acompanhar pedidos e salvar seus favoritos.</p><form onSubmit={submitAccount} className="mt-6 space-y-4"><label className="block text-xs uppercase tracking-wider">E-mail<input required type="email" className="mt-2 h-12 w-full border border-border px-3 text-sm normal-case outline-none focus:border-clay" /></label><label className="block text-xs uppercase tracking-wider">Senha<input required minLength={6} type="password" className="mt-2 h-12 w-full border border-border px-3 text-sm normal-case outline-none focus:border-clay" /></label><button type="submit" className="eyebrow w-full bg-clay px-8 py-4 text-white hover:bg-graphite">Entrar</button></form>{accountMessage && <p className="mt-4 text-xs text-clay" role="status">{accountMessage}</p>}
       </div>
     </>
   );
 }
 
-function Action({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
-  return <button onClick={onClick} type="button" className="flex h-11 w-11 items-center justify-center transition-colors hover:text-clay" aria-label={label}>{children}</button>;
-}
-
-function CloseButton({ onClick, label }: { onClick: () => void; label: string }) {
-  return <button onClick={onClick} type="button" className="flex h-11 w-11 items-center justify-center" aria-label={label}><CloseIcon className="h-5 w-5" /></button>;
-}
+function Action({ label, onClick, children, className = "" }: { label: string; onClick: () => void; children: ReactNode; className?: string }) { return <button onClick={onClick} type="button" className={`h-11 w-11 cursor-pointer items-center justify-center transition-colors hover:text-clay ${className || "flex"}`} aria-label={label}>{children}</button>; }
+function CountBadge({ count }: { count: number }) { return <span className="absolute top-0 right-0 grid h-4 min-w-4 place-items-center rounded-full bg-clay px-1 text-[9px] text-white">{count}</span>; }
+function CloseButton({ onClick, label }: { onClick: () => void; label: string }) { return <button onClick={onClick} type="button" className="flex h-11 w-11 cursor-pointer items-center justify-center" aria-label={label}><CloseIcon className="h-5 w-5" /></button>; }
+function PanelHeader({ close, closeLabel, logo, title }: { close: () => void; closeLabel: string; logo?: boolean; title: string }) { return <div className="flex items-center justify-between border-b border-border px-5 py-4">{logo ? <Image src="/assets/logo-vieste.png" alt="VIESTE CONCETTO" width={320} height={180} className="h-8 w-auto" /> : <h2 className="eyebrow">{title}</h2>}<CloseButton onClick={close} label={closeLabel} /></div>; }
+function SidePanel({ children, close, label, open, title }: { children: ReactNode; close: () => void; label: string; open: boolean; title: string }) { return <aside className={`fixed top-0 right-0 z-60 flex h-dvh w-full max-w-[460px] flex-col bg-background transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] ${open ? "translate-x-0" : "pointer-events-none translate-x-full"}`} aria-hidden={!open} aria-label={label}><PanelHeader close={close} closeLabel={`Fechar ${label.toLowerCase()}`} title={title} /><div className="flex min-h-0 flex-1 flex-col px-5 pb-5">{children}</div></aside>; }
+function EmptyPanel({ close, text, title }: { close: () => void; text: string; title: string }) { return <div className="flex flex-1 flex-col items-center justify-center gap-5 px-3 text-center"><p className="font-serif text-2xl">{title}</p><p className="text-sm text-muted-foreground">{text}</p><a onClick={close} className="eyebrow bg-clay px-8 py-4 text-white transition-colors hover:bg-graphite" href="#novidades">Ver novidades</a></div>; }
+function ProductLine({ actionLabel, onAction, onRemove, product }: { actionLabel: string; onAction: () => void; onRemove: () => void; product: (typeof products)[number] }) { return <div className="flex gap-4 py-5"><Image src={product.image} alt="" width={90} height={130} className="h-[120px] w-20 object-cover" /><div className="flex flex-1 flex-col"><div className="flex justify-between gap-3"><p className="text-sm font-medium">{product.name}</p><button onClick={onRemove} className="text-xs text-muted-foreground underline">Remover</button></div><p className="mt-1 text-xs text-muted-foreground">{product.category} · {product.color}</p><p className="mt-2 text-sm">{product.price}</p><button onClick={onAction} className="eyebrow mt-auto self-start border-b border-graphite pb-1">{actionLabel}</button></div></div>; }
+function parsePrice(price: string) { return Number(price.replace("R$", "").trim().replaceAll(".", "").replace(",", ".")); }
+function formatPrice(value: number) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value); }
