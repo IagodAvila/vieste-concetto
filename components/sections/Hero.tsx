@@ -52,8 +52,6 @@ export function Hero() {
         <a className="button-light eyebrow mt-8 px-9 py-4" href="#campanha">Conheça a coleção</a>
         <div className="mt-10 flex items-center gap-3">{slides.map((_, index) => <button onClick={() => setActive(index)} type="button" aria-label={`Ver campanha ${index + 1}`} aria-current={index === active} className="group flex h-8 items-center" key={index}><span className={`block h-[2px] transition-[width,background-color] duration-500 ${index === active ? "w-14 bg-white" : "w-9 bg-white/45 group-hover:bg-white/75"}`} /></button>)}</div>
       </div>
-      <button className="absolute top-1/2 left-3 z-10 hidden h-12 w-12 -translate-y-1/2 items-center justify-center border border-white/50 text-2xl text-white transition-colors hover:bg-white hover:text-graphite md:flex" onClick={() => move(-1)} type="button" aria-label="Campanha anterior">‹</button>
-      <button className="absolute top-1/2 right-3 z-10 hidden h-12 w-12 -translate-y-1/2 items-center justify-center border border-white/50 text-2xl text-white transition-colors hover:bg-white hover:text-graphite md:flex" onClick={() => move(1)} type="button" aria-label="Próxima campanha">›</button>
     </section>
   );
 }
