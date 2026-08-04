@@ -16,6 +16,7 @@ type ShopContextValue = {
   isFavorite: (slug: string) => boolean;
   toggleFavorite: (slug: string) => void;
   addToCart: (slug: string, size: string) => void;
+  clearCart: () => void;
   removeFromCart: (slug: string, size: string) => void;
   updateQuantity: (slug: string, size: string, quantity: number) => void;
 };
@@ -62,6 +63,7 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
       const line = current.find((item) => item.slug === slug && item.size === size);
       return line ? current.map((item) => item.slug === slug && item.size === size ? { ...item, quantity: item.quantity + 1 } : item) : [...current, { slug, size, quantity: 1 }];
     }),
+    clearCart: () => setCart([]),
     removeFromCart: (slug, size) => setCart((current) => current.filter((item) => item.slug !== slug || item.size !== size)),
     updateQuantity: (slug, size, quantity) => setCart((current) => quantity <= 0 ? current.filter((item) => item.slug !== slug || item.size !== size) : current.map((item) => item.slug === slug && item.size === size ? { ...item, quantity } : item)),
   }), [cart, favoriteSlugs]);

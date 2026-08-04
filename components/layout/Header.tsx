@@ -16,7 +16,6 @@ const collections = ["Movimento 01", "Movimento 02", "Essenciais"];
 export function Header() {
   const [overlay, setOverlay] = useState<Overlay>(null);
   const [query, setQuery] = useState("");
-  const [checkoutMessage, setCheckoutMessage] = useState("");
   const { addToCart, cart, cartCount, favoriteCount, favoriteSlugs, removeFromCart, toggleFavorite, updateQuantity } = useShop();
 
   const favoriteProducts = products.filter((product) => favoriteSlugs.includes(product.slug));
@@ -38,7 +37,6 @@ export function Header() {
 
   function closeOverlay() {
     setOverlay(null);
-    setCheckoutMessage("");
   }
 
   return (
@@ -86,7 +84,7 @@ export function Header() {
       </SidePanel>
 
       <SidePanel open={overlay === "cart"} title={`Sacola · ${cartCount}`} close={closeOverlay} label="Sacola">
-        {cartLines.length ? <><div className="flex-1 divide-y divide-border overflow-y-auto">{cartLines.map(({ product, quantity, size }) => <div className="flex gap-4 py-5" key={`${product.slug}-${size}`}><Image src={product.image} alt="" width={90} height={130} className="h-[120px] w-20 object-cover" /><div className="flex flex-1 flex-col"><p className="text-sm font-medium">{product.name}</p><p className="mt-1 text-xs text-muted-foreground">{product.color} · Tamanho {size}</p><p className="mt-2 text-sm">{product.price}</p><div className="mt-auto flex items-center justify-between"><div className="flex items-center border border-border"><button onClick={() => updateQuantity(product.slug, size, quantity - 1)} className="h-8 w-8 transition-colors hover:bg-peach-soft" aria-label={`Diminuir quantidade de ${product.name}, tamanho ${size}`}>−</button><span className="min-w-7 text-center text-xs">{quantity}</span><button onClick={() => updateQuantity(product.slug, size, quantity + 1)} className="h-8 w-8 transition-colors hover:bg-peach-soft" aria-label={`Aumentar quantidade de ${product.name}, tamanho ${size}`}>+</button></div><button onClick={() => removeFromCart(product.slug, size)} className="text-xs text-muted-foreground underline transition-colors hover:text-clay">Remover</button></div></div></div>)}</div><div className="border-t border-border pt-5"><div className="flex justify-between font-medium"><span>Total</span><span>{formatPrice(cartTotal)}</span></div><p className="mt-1 text-xs text-muted-foreground">Frete calculado na próxima etapa.</p><button onClick={() => setCheckoutMessage("Checkout demonstrativo: falta conectar o meio de pagamento.")} className="button-primary eyebrow mt-5 w-full px-8 py-4">Finalizar compra</button>{checkoutMessage && <p className="mt-3 text-center text-xs text-clay" role="status">{checkoutMessage}</p>}</div></> : <EmptyPanel title="Sua sacola está vazia." text="Descubra as peças que acabaram de chegar." close={closeOverlay} />}
+        {cartLines.length ? <><div className="flex-1 divide-y divide-border overflow-y-auto">{cartLines.map(({ product, quantity, size }) => <div className="flex gap-4 py-5" key={`${product.slug}-${size}`}><Image src={product.image} alt="" width={90} height={130} className="h-[120px] w-20 object-cover" /><div className="flex flex-1 flex-col"><p className="text-sm font-medium">{product.name}</p><p className="mt-1 text-xs text-muted-foreground">{product.color} · Tamanho {size}</p><p className="mt-2 text-sm">{product.price}</p><div className="mt-auto flex items-center justify-between"><div className="flex items-center border border-border"><button onClick={() => updateQuantity(product.slug, size, quantity - 1)} className="h-8 w-8 transition-colors hover:bg-peach-soft" aria-label={`Diminuir quantidade de ${product.name}, tamanho ${size}`}>−</button><span className="min-w-7 text-center text-xs">{quantity}</span><button onClick={() => updateQuantity(product.slug, size, quantity + 1)} className="h-8 w-8 transition-colors hover:bg-peach-soft" aria-label={`Aumentar quantidade de ${product.name}, tamanho ${size}`}>+</button></div><button onClick={() => removeFromCart(product.slug, size)} className="text-xs text-muted-foreground underline transition-colors hover:text-clay">Remover</button></div></div></div>)}</div><div className="border-t border-border pt-5"><div className="flex justify-between font-medium"><span>Total</span><span>{formatPrice(cartTotal)}</span></div><p className="mt-1 text-xs text-muted-foreground">Frete calculado na próxima etapa.</p><Link onClick={closeOverlay} href="/checkout" className="button-primary eyebrow mt-5 w-full px-8 py-4">Finalizar compra</Link></div></> : <EmptyPanel title="Sua sacola está vazia." text="Descubra as peças que acabaram de chegar." close={closeOverlay} />}
       </SidePanel>
 
       <div className={`fixed inset-x-0 top-0 z-60 border-b border-border bg-background transition-[opacity,transform] duration-500 ${overlay === "search" ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-4 opacity-0"}`} aria-hidden={overlay !== "search"}>
