@@ -87,6 +87,12 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
     setZoomPosition({ x: 50, y: 50 });
   }
 
+  function moveImage(direction: -1 | 1) {
+    const currentIndex = gallery.indexOf(activeImage);
+    const nextIndex = Math.min(gallery.length - 1, Math.max(0, currentIndex + direction));
+    if (nextIndex !== currentIndex) selectImage(gallery[nextIndex]);
+  }
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
@@ -107,7 +113,7 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
 
         <div className="bg-secondary md:p-6">
           <div
-            className="relative aspect-2/3 min-w-0 touch-none overflow-hidden bg-background md:aspect-square md:cursor-zoom-in md:touch-auto"
+            className={`relative aspect-2/3 min-w-0 overflow-hidden bg-background md:aspect-square md:cursor-zoom-in md:touch-auto ${touchZoomed ? "touch-none" : "touch-pan-y"}`}
             onMouseEnter={() => setZoomed(true)}
             onMouseLeave={() => setZoomed(false)}
             onMouseMove={(event) => updateZoomPosition(event.currentTarget, event.clientX, event.clientY)}
@@ -124,9 +130,13 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
             }}
             onPointerUp={(event) => {
               if (event.pointerType !== "touch" || touchGesture.current.pointerId !== event.pointerId) return;
+              const distanceX = event.clientX - touchGesture.current.startX;
+              const distanceY = event.clientY - touchGesture.current.startY;
               if (!touchGesture.current.moved) {
                 updateZoomPosition(event.currentTarget, event.clientX, event.clientY);
                 setTouchZoomed((current) => !current);
+              } else if (!touchZoomed && Math.abs(distanceX) >= 48 && Math.abs(distanceX) > Math.abs(distanceY)) {
+                moveImage(distanceX < 0 ? 1 : -1);
               }
               touchGesture.current.pointerId = -1;
             }}
