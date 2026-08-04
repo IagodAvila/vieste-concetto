@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
+import { BLUR_DATA_URL } from "@/lib/image";
 
 const images = [
   { src: "/assets/hero-3.jpg", alt: "Editorial em dunas ao fim da tarde", className: "h-[52vh]" },
@@ -41,7 +42,7 @@ export function Editorial() {
         onPointerUp={stopDragging}
         onPointerCancel={stopDragging}
         onLostPointerCapture={stopDragging}
-      >{images.map((item) => <Image draggable={false} key={item.src} src={item.src} alt={item.alt} width={1000} height={1400} sizes="50vw" className={`w-auto shrink-0 snap-start bg-secondary object-cover ${item.className}`} />)}</div>
+      >{images.map((item) => <Image draggable={false} key={item.src} src={item.src} alt={item.alt} width={1000} height={1400} sizes="50vw" placeholder="blur" blurDataURL={BLUR_DATA_URL} className={`w-auto shrink-0 snap-start bg-secondary object-cover ${item.className}`} />)}</div>
     </section>
   );
 }

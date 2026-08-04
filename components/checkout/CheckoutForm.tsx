@@ -53,7 +53,7 @@ export function CheckoutForm() {
         <p className="eyebrow text-clay">Sua sacola</p>
         <h1 className="mt-4 font-serif text-7xl leading-none">Ainda está vazia</h1>
         <p className="mt-5 text-sm leading-relaxed text-muted-foreground">Escolha suas peças e volte aqui para informar os dados de entrega.</p>
-        <Link className="button-primary eyebrow mt-8 px-9 py-4" href="/#novidades">Ver novidades</Link>
+        <Link className="button-primary eyebrow mt-8 px-9 py-4" href="/novidades">Ver novidades</Link>
       </section>
     );
   }

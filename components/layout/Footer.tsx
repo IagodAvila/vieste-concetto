@@ -1,10 +1,11 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { FacebookIcon, InstagramIcon } from "@/components/ui/Icons";
 
 const groups = [
-  { title: "Atendimento", links: ["Fale com a gente", "Minha conta", "Guia de medidas"] },
-  { title: "Ajuda", links: ["Trocas e devoluções", "Envios e entregas", "Política de privacidade"] },
+  { title: "Atendimento", links: [{ label: "Fale com a gente", href: "/contato" }, { label: "Minha conta", href: "/minha-conta" }, { label: "Guia de medidas", href: "/guia-de-medidas" }] },
+  { title: "Ajuda", links: [{ label: "Trocas e devoluções", href: "/trocas-e-devolucoes" }, { label: "Envios e entregas", href: "/envios-e-entregas" }, { label: "Política de privacidade", href: "/politica-de-privacidade" }] },
 ];
 
 export function Footer() {
@@ -20,7 +21,7 @@ export function Footer() {
               <SocialLink href="https://www.instagram.com/viesteconcetto?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" label="Instagram"><InstagramIcon className="h-5 w-5" /></SocialLink>
             </div>
           </div>
-          {groups.map((group) => <nav aria-label={group.title} key={group.title}><h2 className="eyebrow text-clay">{group.title}</h2><ul className="mt-5 space-y-3">{group.links.map((link) => <li key={link}><a className="link-underline text-sm" href="#">{link}</a></li>)}</ul></nav>)}
+          {groups.map((group) => <nav aria-label={group.title} key={group.title}><h2 className="eyebrow text-clay">{group.title}</h2><ul className="mt-5 space-y-3">{group.links.map((link) => <li key={link.href}><Link className="link-underline text-sm" href={link.href}>{link.label}</Link></li>)}</ul></nav>)}
         </div>
         <div className="mt-14 flex flex-col gap-4 border-t border-border pt-6 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
           <p>© 2026 Vieste Concetto. Todos os direitos reservados.</p>
