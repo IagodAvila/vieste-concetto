@@ -4,10 +4,13 @@ import { orderItems, orders } from "@/db/schema";
 import { products } from "@/data/products";
 import { createPagBankCheckout, PagBankApiError, PagBankConfigurationError } from "@/lib/pagbank";
 
+const MOTOBOY_SHIPPING_AMOUNT = 2000;
+
 type OrderRequest = {
   cart?: Array<{ slug?: string; size?: string; quantity?: number }>;
   customer?: { name?: string; email?: string; phone?: string; document?: string };
-  shippingAddress?: { postalCode?: string; address?: string; number?: string; complement?: string; district?: string; city?: string; state?: string };
+  shippingAddress?: { postalCode?: string; address?: string; number?: string; complement?: string; district?: string; city?: string; state?: string; hasDoorman?: boolean };
+  shippingMethod?: string;
 };
 
 export async function POST(request: Request) {
@@ -33,8 +36,9 @@ export async function POST(request: Request) {
     };
   });
   const subtotalAmount = normalizedItems.reduce((total, item) => total + item.totalAmount, 0);
-  if (subtotalAmount < 49900) return Response.json({ error: "O cálculo de frete para este pedido ainda não está disponível." }, { status: 422 });
-  const shippingAmount = 0;
+  const shippingMethod = input.shippingMethod === "motoboy" ? "motoboy" : "standard";
+  if (shippingMethod === "standard" && subtotalAmount < 49900) return Response.json({ error: "O cálculo de frete para este pedido ainda não está disponível." }, { status: 422 });
+  const shippingAmount = shippingMethod === "motoboy" ? MOTOBOY_SHIPPING_AMOUNT : 0;
   const totalAmount = subtotalAmount + shippingAmount;
   const id = crypto.randomUUID();
   const referenceId = `VIESTE-${Date.now()}-${id.slice(0, 8).toUpperCase()}`;
@@ -55,6 +59,8 @@ export async function POST(request: Request) {
       district: input.shippingAddress!.district!.trim(),
       city: input.shippingAddress!.city!.trim(),
       state: input.shippingAddress!.state!.trim().toUpperCase(),
+      hasDoorman: Boolean(input.shippingAddress!.hasDoorman),
+      shippingMethod,
       shippingAmount,
       subtotalAmount,
       totalAmount,
@@ -88,8 +94,8 @@ export async function POST(request: Request) {
         unit_amount: item.unitAmount,
       })),
       shipping: {
-        type: "FREE",
-        amount: 0,
+        type: shippingAmount > 0 ? "FIXED" : "FREE",
+        amount: shippingAmount,
         address: {
           country: "BRA",
           region_code: input.shippingAddress!.state!.trim().toUpperCase(),
@@ -98,7 +104,7 @@ export async function POST(request: Request) {
           street: input.shippingAddress!.address!.trim(),
           number: input.shippingAddress!.number!.trim(),
           locality: input.shippingAddress!.district!.trim(),
-          complement: input.shippingAddress!.complement?.trim() || undefined,
+          complement: appendDoormanNote(input.shippingAddress!.complement, input.shippingAddress!.hasDoorman),
         },
         address_modifiable: false,
       },
@@ -147,6 +153,12 @@ function validateInput(input: OrderRequest) {
   const address = input.shippingAddress;
   if (!address?.address?.trim() || !address.number?.trim() || !address.district?.trim() || !address.city?.trim() || address.state?.trim().length !== 2 || digits(address.postalCode ?? "").length !== 8) return "Confira o endereço de entrega.";
   return null;
+}
+
+function appendDoormanNote(complement: string | undefined, hasDoorman: boolean | undefined) {
+  const trimmed = complement?.trim();
+  const note = hasDoorman ? "Com portaria/porteiro" : "Sem portaria/porteiro";
+  return trimmed ? `${trimmed} — ${note}` : note;
 }
 
 function digits(value: string) {

@@ -1,0 +1,1 @@
+ALTER TABLE `orders` ADD `has_doorman` integer DEFAULT false NOT NULL;

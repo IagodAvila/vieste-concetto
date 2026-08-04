@@ -16,6 +16,7 @@ export const orders = sqliteTable("orders", {
   district: text("district").notNull(),
   city: text("city").notNull(),
   state: text("state").notNull(),
+  hasDoorman: integer("has_doorman", { mode: "boolean" }).notNull().default(false),
   shippingMethod: text("shipping_method").notNull().default("standard"),
   shippingAmount: integer("shipping_amount").notNull().default(0),
   subtotalAmount: integer("subtotal_amount").notNull(),

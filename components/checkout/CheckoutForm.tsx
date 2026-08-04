@@ -9,9 +9,12 @@ import { products } from "@/data/products";
 
 const inputClass = "mt-2 h-13 w-full border border-border bg-background px-4 text-sm outline-none transition-colors placeholder:text-muted-foreground/65 focus:border-clay";
 
+const MOTOBOY_SHIPPING_AMOUNT = 2000;
+
 export function CheckoutForm() {
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [shippingMethod, setShippingMethod] = useState<"standard" | "motoboy">("standard");
   const { cart } = useShop();
   const lines = cart.flatMap((line) => {
     const product = products.find((item) => item.slug === line.slug);
@@ -19,6 +22,8 @@ export function CheckoutForm() {
   });
   const subtotal = lines.reduce((total, line) => total + priceInCents(line.product.price) * line.quantity, 0);
   const freeShipping = subtotal >= 49900;
+  const shippingAmount = shippingMethod === "motoboy" ? MOTOBOY_SHIPPING_AMOUNT : 0;
+  const total = subtotal + shippingAmount;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -32,7 +37,8 @@ export function CheckoutForm() {
         body: JSON.stringify({
           cart: cart.map(({ slug, size, quantity }) => ({ slug, size, quantity })),
           customer: { name: data.get("name"), email: data.get("email"), phone: data.get("phone"), document: data.get("document") },
-          shippingAddress: { postalCode: data.get("postalCode"), address: data.get("address"), number: data.get("number"), complement: data.get("complement"), district: data.get("district"), city: data.get("city"), state: data.get("state") },
+          shippingAddress: { postalCode: data.get("postalCode"), address: data.get("address"), number: data.get("number"), complement: data.get("complement"), district: data.get("district"), city: data.get("city"), state: data.get("state"), hasDoorman: data.get("hasDoorman") === "on" },
+          shippingMethod: data.get("shipping"),
         }),
       });
       const result = await response.json() as { error?: string; referenceId?: string; paymentUrl?: string };
@@ -87,14 +93,21 @@ export function CheckoutForm() {
                 <Field label="Bairro" name="district" type="text" />
                 <Field autoComplete="address-level2" label="Cidade" name="city" type="text" />
                 <Field autoComplete="address-level1" label="Estado" maxLength={2} name="state" placeholder="UF" type="text" />
+                <label className="flex cursor-pointer items-center gap-3 sm:col-span-2"><input className="h-4 w-4 accent-clay" name="hasDoorman" type="checkbox" /><span className="text-xs font-medium tracking-wider uppercase">Tem portaria/porteiro?</span></label>
               </div>
             </FormSection>
 
             <FormSection number="03" title="Forma de entrega">
-              <label className="flex cursor-pointer items-start justify-between gap-4 border border-clay bg-peach-soft p-5">
-                <span className="flex items-start gap-3"><input defaultChecked className="mt-1 h-4 w-4 accent-clay" name="shipping" type="radio" value="standard" /><span><strong className="block text-sm font-medium">Entrega padrão</strong><small className="mt-1 block text-muted-foreground">O prazo será confirmado após a validação do CEP.</small></span></span>
-                <strong className="text-sm text-clay">{freeShipping ? "Grátis" : "A calcular"}</strong>
-              </label>
+              <div className="space-y-3">
+                <label className={`flex cursor-pointer items-start justify-between gap-4 border p-5 ${shippingMethod === "standard" ? "border-clay bg-peach-soft" : "border-border"}`}>
+                  <span className="flex items-start gap-3"><input checked={shippingMethod === "standard"} className="mt-1 h-4 w-4 accent-clay" name="shipping" onChange={() => setShippingMethod("standard")} type="radio" value="standard" /><span><strong className="block text-sm font-medium">Entrega padrão</strong><small className="mt-1 block text-muted-foreground">O prazo será confirmado após a validação do CEP.</small></span></span>
+                  <strong className="text-sm text-clay">{freeShipping ? "Grátis" : "A calcular"}</strong>
+                </label>
+                <label className={`flex cursor-pointer items-start justify-between gap-4 border p-5 ${shippingMethod === "motoboy" ? "border-clay bg-peach-soft" : "border-border"}`}>
+                  <span className="flex items-start gap-3"><input checked={shippingMethod === "motoboy"} className="mt-1 h-4 w-4 accent-clay" name="shipping" onChange={() => setShippingMethod("motoboy")} type="radio" value="motoboy" /><span><strong className="block text-sm font-medium">Motoboy — BH e Nova Lima</strong><small className="mt-1 block text-muted-foreground">Frete fixo, entrega no mesmo dia útil conforme disponibilidade.</small></span></span>
+                  <strong className="text-sm text-clay">{formatCurrency(MOTOBOY_SHIPPING_AMOUNT)}</strong>
+                </label>
+              </div>
             </FormSection>
           </div>
 
@@ -110,8 +123,8 @@ export function CheckoutForm() {
             </div>
             <dl className="mt-5 space-y-3 text-sm">
               <div className="flex justify-between"><dt className="text-muted-foreground">Subtotal</dt><dd>{formatCurrency(subtotal)}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted-foreground">Frete</dt><dd className={freeShipping ? "text-clay" : ""}>{freeShipping ? "Grátis" : "A calcular"}</dd></div>
-              <div className="flex justify-between border-t border-border pt-4 text-base font-medium"><dt>Total</dt><dd>{formatCurrency(subtotal)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">Frete</dt><dd className={shippingAmount === 0 && freeShipping ? "text-clay" : ""}>{shippingMethod === "motoboy" ? formatCurrency(MOTOBOY_SHIPPING_AMOUNT) : freeShipping ? "Grátis" : "A calcular"}</dd></div>
+              <div className="flex justify-between border-t border-border pt-4 text-base font-medium"><dt>Total</dt><dd>{formatCurrency(total)}</dd></div>
             </dl>
             <button className="button-primary eyebrow mt-6 w-full px-6 py-4 disabled:cursor-wait disabled:opacity-60" disabled={submitting} type="submit">{submitting ? "Criando pedido..." : "Continuar para pagamento"}</button>
             <p className="mt-4 text-center text-xs leading-relaxed text-muted-foreground">O pagamento será processado no ambiente seguro do PagBank.</p>
