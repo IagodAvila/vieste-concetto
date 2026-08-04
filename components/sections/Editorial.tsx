@@ -23,7 +23,7 @@ export function Editorial() {
 
   return (
     <section className="pb-20 md:pb-28" aria-labelledby="editorial-title">
-      <div className="mx-auto max-w-[1600px] px-4 md:px-10"><div className="flex items-end justify-between gap-6"><div><p className="eyebrow text-clay">@viesteconcetto</p><h2 className="mt-3 font-serif text-6xl md:text-7xl" id="editorial-title">Editorial</h2></div><a className="eyebrow link-underline" href="#editorial-title">Seguir</a></div></div>
+      <div className="mx-auto max-w-[1600px] px-4 md:px-10"><div className="flex items-end justify-between gap-6"><div><p className="eyebrow text-clay">@viesteconcetto</p><h2 className="mt-3 font-serif text-6xl md:text-7xl" id="editorial-title">Editorial</h2></div><a className="eyebrow link-underline" href="https://www.instagram.com/viesteconcetto?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noreferrer" aria-label="Seguir a Vieste Concetto no Instagram — abre em nova aba">Seguir</a></div></div>
       <div
         ref={trackRef}
         className={`scrollbar-hidden mt-10 flex touch-pan-x snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 select-none md:px-10 ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
