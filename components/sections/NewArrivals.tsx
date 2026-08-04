@@ -79,6 +79,13 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
     });
   }
 
+  function selectImage(image: string) {
+    setActiveImage(image);
+    setZoomed(false);
+    setTouchZoomed(false);
+    setZoomPosition({ x: 50, y: 50 });
+  }
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
@@ -94,11 +101,12 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
   return (
     <div className="fixed inset-0 z-70 overflow-y-auto bg-graphite/55 p-0 backdrop-blur-sm md:p-6" role="dialog" aria-modal="true" aria-labelledby={`product-title-${product.slug}`} onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <div className="relative mx-auto grid min-h-dvh max-w-6xl bg-background shadow-2xl md:min-h-0 md:grid-cols-2">
-        <button onClick={onClose} className="absolute top-4 right-4 z-40 grid h-11 w-11 place-items-center rounded-full bg-background/90 shadow-sm" type="button" aria-label="Fechar detalhes do produto"><CloseIcon className="h-5 w-5" /></button>
+        <button onClick={onClose} className="eyebrow absolute top-3 left-3 z-40 bg-background/90 px-2.5 py-1.5 text-base md:hidden" type="button">← Voltar</button>
+        <button onClick={onClose} className="absolute top-4 right-4 z-40 hidden h-11 w-11 place-items-center rounded-full bg-background/90 shadow-sm md:grid" type="button" aria-label="Fechar detalhes do produto"><CloseIcon className="h-5 w-5" /></button>
 
-        <div className="bg-secondary p-3 md:p-6">
+        <div className="bg-secondary md:p-6">
           <div
-            className="relative aspect-square min-w-0 touch-none overflow-hidden bg-background md:cursor-zoom-in md:touch-auto"
+            className="relative aspect-2/3 min-w-0 touch-none overflow-hidden bg-background md:aspect-square md:cursor-zoom-in md:touch-auto"
             onMouseEnter={() => setZoomed(true)}
             onMouseLeave={() => setZoomed(false)}
             onMouseMove={(event) => updateZoomPosition(event.currentTarget, event.clientX, event.clientY)}
@@ -119,7 +127,7 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
               alt={`${product.name} — foto ampliada`}
               fill
               sizes="(min-width: 768px) 50vw, 100vw"
-              className="pointer-events-none object-contain"
+              className="pointer-events-none object-cover md:object-contain"
               priority
             />
             <div className={`pointer-events-none absolute inset-0 z-10 overflow-hidden transition-opacity duration-150 md:hidden ${touchZoomed ? "opacity-100" : "opacity-0"}`} aria-hidden="true">
@@ -132,15 +140,16 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
                   top: `${50 - zoomPosition.y * 2.5}%`,
                 }}
               >
-                <Image src={activeImage} alt="" fill sizes="250vw" className="object-contain" />
+                <Image src={activeImage} alt="" fill sizes="250vw" className="object-cover" />
               </div>
             </div>
-            <span className={`eyebrow pointer-events-none absolute right-3 bottom-3 z-20 bg-background/90 px-3 py-2 transition-opacity md:hidden ${touchZoomed ? "opacity-0" : "opacity-100"}`}>Toque e arraste para ampliar</span>
             <span className={`pointer-events-none absolute hidden border border-white/90 bg-white/65 shadow-md transition-opacity duration-200 md:block ${zoomed ? "opacity-100" : "opacity-0"}`} style={{ width: "40%", height: "40%", left: `${zoomPosition.x - 20}%`, top: `${zoomPosition.y - 20}%` }} />
-            <span className={`eyebrow pointer-events-none absolute right-3 bottom-3 hidden bg-background/90 px-3 py-2 transition-opacity md:block ${zoomed ? "opacity-0" : "opacity-100"}`}>Passe a lupa para ver os detalhes</span>
+            <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 justify-center gap-2 md:hidden" role="group" aria-label="Fotos do produto">
+              {gallery.map((image, index) => <button key={`${image}-${index}`} onClick={() => selectImage(image)} onPointerDown={(event) => event.stopPropagation()} type="button" aria-label={`Ver foto ${index + 1} de ${product.name}`} aria-pressed={activeImage === image} className="flex h-8 items-center"><span className={`block h-0.5 shadow-sm transition-[width,background-color] duration-300 ${activeImage === image ? "w-12 bg-graphite" : "w-8 bg-graphite/35"}`} /></button>)}
+            </div>
           </div>
-          <div className="mt-3 flex justify-center gap-3">
-            {gallery.map((image, index) => <button key={`${image}-${index}`} onClick={() => { setActiveImage(image); setZoomed(false); setTouchZoomed(false); setZoomPosition({ x: 50, y: 50 }); }} type="button" aria-label={`Ver foto ${index + 1} de ${product.name}`} aria-pressed={activeImage === image} className={`w-16 overflow-hidden border-2 bg-background md:w-[4.5rem] ${activeImage === image ? "border-clay" : "border-transparent"}`}><Image src={image} alt="" width={120} height={180} className="aspect-2/3 object-cover" /></button>)}
+          <div className="mt-3 hidden justify-center gap-3 md:flex" role="group" aria-label="Fotos do produto">
+            {gallery.map((image, index) => <button key={`${image}-${index}`} onClick={() => selectImage(image)} onFocus={() => selectImage(image)} onMouseEnter={() => selectImage(image)} type="button" aria-label={`Ver foto ${index + 1} de ${product.name}`} aria-pressed={activeImage === image} className={`w-[4.5rem] overflow-hidden border-2 bg-background ${activeImage === image ? "border-clay" : "border-transparent"}`}><Image src={image} alt="" width={120} height={180} className="aspect-2/3 object-cover" /></button>)}
           </div>
         </div>
 
