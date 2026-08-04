@@ -17,7 +17,7 @@ export function NewArrivals() {
         <ul className="mt-12 grid grid-cols-2 gap-x-4 gap-y-12 md:gap-x-6 lg:grid-cols-4">
           {products.map((product) => <li key={product.name}><ProductCard product={product} onOpen={() => setSelectedProduct(product)} /></li>)}
         </ul>
-        <div className="mt-12 text-center md:hidden"><a href="#novidades" className="eyebrow border border-graphite px-8 py-4">Ver tudo</a></div>
+        <div className="mt-12 text-center md:hidden"><a href="#novidades" className="button-secondary eyebrow px-8 py-4">Ver tudo</a></div>
       </section>
       {selectedProduct && <ProductDetails product={selectedProduct} onClose={() => setSelectedProduct(null)} />}
     </>
