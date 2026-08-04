@@ -62,7 +62,7 @@ function ProductCard({ product, onOpen }: { product: Product; onOpen: () => void
   return (
     <article className="group relative">
       <div className="relative overflow-hidden bg-secondary">
-        <Image src={product.image} alt={`${product.name} — ${product.category}`} width={1000} height={1500} sizes="(min-width:1024px) 25vw, 50vw" placeholder="blur" blurDataURL={BLUR_DATA_URL} className="aspect-2/3 w-full object-cover" />
+        <Image src={product.image} alt={`${product.name} — ${product.category}`} width={1000} height={1500} sizes="(min-width:1024px) 25vw, 50vw" placeholder="blur" blurDataURL={BLUR_DATA_URL} className="aspect-2/3 w-full object-cover transition-transform duration-500 group-hover:scale-105" />
         {product.badge && <span className="eyebrow pointer-events-none absolute top-3 left-3 z-20 bg-background/90 px-2 py-1">{product.badge}</span>}
         <button className="absolute inset-0 z-10 cursor-zoom-in" onClick={onOpen} type="button" aria-label={`Ampliar fotos e ver detalhes de ${product.name}`} />
         <button onClick={addSelectedSize} className="button-light eyebrow absolute bottom-3 left-3 z-20 hidden translate-y-2 gap-2 px-5 py-3 opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-100 md:flex" type="button"><PlusIcon className="h-3.5 w-3.5" />{sizeError ? "Escolha o tamanho" : quantity ? `Na sacola · ${quantity}` : "Adicionar à sacola"}</button>
@@ -124,7 +124,7 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
     <div className="fixed inset-0 z-70 overflow-y-auto bg-graphite/55 p-0 backdrop-blur-sm md:p-6" role="dialog" aria-modal="true" aria-labelledby={`product-title-${product.slug}`} onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <div className="relative mx-auto grid min-h-dvh max-w-6xl bg-background shadow-2xl md:min-h-0 md:grid-cols-2">
         <button onClick={onClose} className="eyebrow absolute top-3 left-3 z-40 bg-background/90 px-2.5 py-1.5 text-base md:hidden" type="button">← Voltar</button>
-        <button onClick={onClose} className="absolute top-4 right-4 z-40 hidden h-11 w-11 place-items-center rounded-full bg-background/90 shadow-sm md:grid" type="button" aria-label="Fechar detalhes do produto"><CloseIcon className="h-5 w-5" /></button>
+        <button onClick={onClose} className="absolute top-4 right-4 z-40 hidden h-11 w-11 place-items-center text-graphite transition-all hover:scale-110 hover:text-clay md:grid" type="button" aria-label="Fechar detalhes do produto"><CloseIcon className="h-5 w-5" /></button>
 
         <div className="bg-secondary md:p-6">
           <div
