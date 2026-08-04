@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CloseIcon, PlusIcon, HeartIcon } from "@/components/ui/Icons";
 import { useShop } from "@/components/providers/ShopProvider";
 import { products } from "@/data/products";
@@ -67,6 +67,7 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
   const [selectedSize, setSelectedSize] = useState("");
   const [sizeError, setSizeError] = useState(false);
+  const touchGesture = useRef({ pointerId: -1, startX: 0, startY: 0, moved: false });
   const { addToCart, cart } = useShop();
   const quantity = cart.filter((line) => line.slug === product.slug).reduce((total, line) => total + line.quantity, 0);
   const gallery = [product.image, product.secondaryImage];
@@ -113,14 +114,23 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
             onPointerDown={(event) => {
               if (event.pointerType !== "touch") return;
               event.currentTarget.setPointerCapture(event.pointerId);
-              updateZoomPosition(event.currentTarget, event.clientX, event.clientY);
-              setTouchZoomed(true);
+              touchGesture.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, moved: false };
+              if (touchZoomed) updateZoomPosition(event.currentTarget, event.clientX, event.clientY);
             }}
             onPointerMove={(event) => {
-              if (event.pointerType === "touch" && event.currentTarget.hasPointerCapture(event.pointerId)) updateZoomPosition(event.currentTarget, event.clientX, event.clientY);
+              if (event.pointerType !== "touch" || touchGesture.current.pointerId !== event.pointerId) return;
+              if (Math.hypot(event.clientX - touchGesture.current.startX, event.clientY - touchGesture.current.startY) > 6) touchGesture.current.moved = true;
+              if (touchZoomed) updateZoomPosition(event.currentTarget, event.clientX, event.clientY);
             }}
-            onPointerUp={(event) => { if (event.pointerType === "touch") setTouchZoomed(false); }}
-            onPointerCancel={(event) => { if (event.pointerType === "touch") setTouchZoomed(false); }}
+            onPointerUp={(event) => {
+              if (event.pointerType !== "touch" || touchGesture.current.pointerId !== event.pointerId) return;
+              if (!touchGesture.current.moved) {
+                updateZoomPosition(event.currentTarget, event.clientX, event.clientY);
+                setTouchZoomed((current) => !current);
+              }
+              touchGesture.current.pointerId = -1;
+            }}
+            onPointerCancel={(event) => { if (event.pointerType === "touch") touchGesture.current.pointerId = -1; }}
           >
             <Image
               src={activeImage}
@@ -145,7 +155,7 @@ function ProductDetails({ product, onClose }: { product: Product; onClose: () =>
             </div>
             <span className={`pointer-events-none absolute hidden border border-white/90 bg-white/65 shadow-md transition-opacity duration-200 md:block ${zoomed ? "opacity-100" : "opacity-0"}`} style={{ width: "40%", height: "40%", left: `${zoomPosition.x - 20}%`, top: `${zoomPosition.y - 20}%` }} />
             <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 justify-center gap-2 md:hidden" role="group" aria-label="Fotos do produto">
-              {gallery.map((image, index) => <button key={`${image}-${index}`} onClick={() => selectImage(image)} onPointerDown={(event) => event.stopPropagation()} type="button" aria-label={`Ver foto ${index + 1} de ${product.name}`} aria-pressed={activeImage === image} className="flex h-8 items-center"><span className={`block h-0.5 shadow-sm transition-[width,background-color] duration-300 ${activeImage === image ? "w-12 bg-graphite" : "w-8 bg-graphite/35"}`} /></button>)}
+              {gallery.map((image, index) => <button key={`${image}-${index}`} onClick={(event) => { event.stopPropagation(); selectImage(image); }} onPointerDown={(event) => event.stopPropagation()} type="button" aria-label={`Ver foto ${index + 1} de ${product.name}`} aria-pressed={activeImage === image} className="flex h-8 items-center"><span className={`block h-0.5 shadow-sm transition-[width,background-color] duration-300 ${activeImage === image ? "w-12 bg-graphite" : "w-8 bg-graphite/35"}`} /></button>)}
             </div>
           </div>
           <div className="mt-3 hidden justify-center gap-3 md:flex" role="group" aria-label="Fotos do produto">
