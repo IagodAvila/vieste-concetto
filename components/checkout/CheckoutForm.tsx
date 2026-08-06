@@ -15,6 +15,7 @@ export function CheckoutForm() {
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [shippingMethod, setShippingMethod] = useState<"standard" | "motoboy">("standard");
+  const [doorman, setDoorman] = useState<"yes" | "no" | "">("");
   const { cart } = useShop();
   const lines = cart.flatMap((line) => {
     const product = products.find((item) => item.slug === line.slug);
@@ -37,7 +38,7 @@ export function CheckoutForm() {
         body: JSON.stringify({
           cart: cart.map(({ slug, size, quantity }) => ({ slug, size, quantity })),
           customer: { name: data.get("name"), email: data.get("email"), phone: data.get("phone"), document: data.get("document") },
-          shippingAddress: { postalCode: data.get("postalCode"), address: data.get("address"), number: data.get("number"), complement: data.get("complement"), district: data.get("district"), city: data.get("city"), state: data.get("state"), hasDoorman: data.get("hasDoorman") === "on" },
+          shippingAddress: { postalCode: data.get("postalCode"), address: data.get("address"), number: data.get("number"), complement: data.get("complement"), district: data.get("district"), city: data.get("city"), state: data.get("state"), hasDoorman: data.get("hasDoorman") === "yes" },
           shippingMethod: data.get("shipping"),
         }),
       });
@@ -93,7 +94,13 @@ export function CheckoutForm() {
                 <Field label="Bairro" name="district" type="text" />
                 <Field autoComplete="address-level2" label="Cidade" name="city" type="text" />
                 <Field autoComplete="address-level1" label="Estado" maxLength={2} name="state" placeholder="UF" type="text" />
-                <label className="flex cursor-pointer items-center gap-3 sm:col-span-2"><input className="h-4 w-4 accent-clay" name="hasDoorman" type="checkbox" /><span className="text-xs font-medium tracking-wider uppercase">Tem portaria/porteiro?</span></label>
+                <div className="sm:col-span-2">
+                  <p className="text-xs font-medium tracking-wider uppercase">O prédio tem portaria/porteiro?</p>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <label className={`flex cursor-pointer items-center gap-3 border p-4 ${doorman === "yes" ? "border-clay bg-peach-soft" : "border-border"}`}><input checked={doorman === "yes"} className="h-4 w-4 accent-clay" name="hasDoorman" onChange={() => setDoorman("yes")} required type="radio" value="yes" /><span className="text-sm">Prédio com portaria/porteiro</span></label>
+                    <label className={`flex cursor-pointer items-center gap-3 border p-4 ${doorman === "no" ? "border-clay bg-peach-soft" : "border-border"}`}><input checked={doorman === "no"} className="h-4 w-4 accent-clay" name="hasDoorman" onChange={() => setDoorman("no")} required type="radio" value="no" /><span className="text-sm">Prédio sem portaria/porteiro</span></label>
+                  </div>
+                </div>
               </div>
             </FormSection>
 
