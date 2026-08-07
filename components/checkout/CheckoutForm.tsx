@@ -79,15 +79,15 @@ export function CheckoutForm() {
             <FormSection number="01" title="Contato">
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field autoComplete="email" label="E-mail" name="email" placeholder="voce@email.com" type="email" />
-                <Field autoComplete="tel" label="Telefone" name="phone" placeholder="(00) 00000-0000" type="tel" />
+                <Field autoComplete="tel" digitsOnly inputMode="tel" label="Celular" maxLength={11} name="phone" placeholder="(00) 90000-0000" stripCountryCode type="tel" />
               </div>
             </FormSection>
 
             <FormSection number="02" title="Entrega">
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field autoComplete="name" className="sm:col-span-2" label="Nome completo" name="name" type="text" />
-                <Field inputMode="numeric" label="CPF" maxLength={11} name="document" placeholder="Somente números" type="text" />
-                <Field autoComplete="postal-code" inputMode="numeric" label="CEP" maxLength={9} name="postalCode" placeholder="00000-000" type="text" />
+                <Field digitsOnly inputMode="numeric" label="CPF" maxLength={11} name="document" placeholder="Somente números" type="text" />
+                <Field autoComplete="postal-code" digitsOnly inputMode="numeric" label="CEP" maxLength={8} name="postalCode" placeholder="00000-000" type="text" />
                 <Field autoComplete="address-line1" className="sm:col-span-2" label="Endereço" name="address" type="text" />
                 <Field label="Número" name="number" type="text" />
                 <Field label="Complemento" name="complement" required={false} type="text" />
@@ -97,8 +97,8 @@ export function CheckoutForm() {
                 <div className="sm:col-span-2">
                   <p className="text-xs font-medium tracking-wider uppercase">O prédio tem portaria/porteiro?</p>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    <label className={`flex cursor-pointer items-center gap-3 border p-4 ${doorman === "yes" ? "border-clay bg-peach-soft" : "border-border"}`}><input checked={doorman === "yes"} className="h-4 w-4 accent-clay" name="hasDoorman" onChange={() => setDoorman("yes")} required type="radio" value="yes" /><span className="text-sm">Prédio com portaria/porteiro</span></label>
-                    <label className={`flex cursor-pointer items-center gap-3 border p-4 ${doorman === "no" ? "border-clay bg-peach-soft" : "border-border"}`}><input checked={doorman === "no"} className="h-4 w-4 accent-clay" name="hasDoorman" onChange={() => setDoorman("no")} required type="radio" value="no" /><span className="text-sm">Prédio sem portaria/porteiro</span></label>
+                    <label className={`flex cursor-pointer items-center gap-3 border p-4 ${doorman === "yes" ? "border-clay bg-peach-soft" : "border-border"}`}><input checked={doorman === "yes"} className="h-4 w-4 accent-clay" name="hasDoorman" onChange={() => setDoorman("yes")} required type="radio" value="yes" /><span className="text-sm">Sim</span></label>
+                    <label className={`flex cursor-pointer items-center gap-3 border p-4 ${doorman === "no" ? "border-clay bg-peach-soft" : "border-border"}`}><input checked={doorman === "no"} className="h-4 w-4 accent-clay" name="hasDoorman" onChange={() => setDoorman("no")} required type="radio" value="no" /><span className="text-sm">Não</span></label>
                   </div>
                 </div>
               </div>
@@ -147,8 +147,19 @@ function FormSection({ children, number, title }: { children: React.ReactNode; n
   return <fieldset className="border border-border bg-background p-5 md:p-7"><legend className="sr-only">{title}</legend><div className="mb-6 flex items-baseline gap-4"><span className="font-serif text-4xl text-clay" aria-hidden>{number}</span><h2 className="font-serif text-6xl leading-none">{title}</h2></div>{children}</fieldset>;
 }
 
-function Field({ autoComplete, className = "", inputMode, label, maxLength, name, placeholder, required = true, type }: { autoComplete?: string; className?: string; inputMode?: "numeric" | "tel"; label: string; maxLength?: number; name: string; placeholder?: string; required?: boolean; type: string }) {
-  return <label className={`block text-xs font-medium tracking-wider uppercase ${className}`}>{label}<input className={inputClass} autoComplete={autoComplete} inputMode={inputMode} maxLength={maxLength} name={name} placeholder={placeholder} required={required} type={type} /></label>;
+function Field({ autoComplete, className = "", digitsOnly = false, inputMode, label, maxLength, name, placeholder, required = true, stripCountryCode = false, type }: { autoComplete?: string; className?: string; digitsOnly?: boolean; inputMode?: "numeric" | "tel"; label: string; maxLength?: number; name: string; placeholder?: string; required?: boolean; stripCountryCode?: boolean; type: string }) {
+  // Campos digitsOnly não usam o `maxLength` nativo do input: ele conta pontuação
+  // colada (ex. "456.789.123-64"), cortando dígitos reais antes de sanitizar.
+  const onInput = digitsOnly
+    ? (event: FormEvent<HTMLInputElement>) => {
+        let value = event.currentTarget.value.replace(/\D/g, "");
+        // Autopreenchimento do navegador costuma salvar o telefone com "+55" na
+        // frente — aceita com ou sem DDI em vez de cortar os dígitos reais.
+        if (stripCountryCode && maxLength && value.length > maxLength && value.startsWith("55")) value = value.slice(2);
+        event.currentTarget.value = value.slice(0, maxLength);
+      }
+    : undefined;
+  return <label className={`block text-xs font-medium tracking-wider uppercase ${className}`}>{label}<input className={inputClass} autoComplete={autoComplete} inputMode={inputMode} maxLength={digitsOnly ? undefined : maxLength} name={name} onInput={onInput} placeholder={placeholder} required={required} type={type} /></label>;
 }
 
 function priceInCents(price: string) {
