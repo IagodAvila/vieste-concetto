@@ -1,7 +1,7 @@
 import { eq, or, sql } from "drizzle-orm";
 import { getDb } from "@/db";
 import { orders, paymentEvents } from "@/db/schema";
-import { getPagBankToken, PagBankConfigurationError } from "@/lib/pagbank";
+import { getPagBankToken, mapPagBankStatus, PagBankConfigurationError } from "@/lib/pagbank";
 
 type PagBankNotification = {
   id?: string;
@@ -52,23 +52,9 @@ export async function POST(request: Request) {
     payload: rawPayload,
   }).onConflictDoNothing({ target: paymentEvents.providerEventId });
 
-  const nextStatus = order.status === "PAID" ? "PAID" : mapStatus(providerStatus);
+  const nextStatus = order.status === "PAID" ? "PAID" : mapPagBankStatus(providerStatus);
   await db.update(orders).set({ status: nextStatus, updatedAt: sql`CURRENT_TIMESTAMP` }).where(eq(orders.id, order.id));
   return new Response(null, { status: 204 });
-}
-
-function mapStatus(status: string) {
-  const statuses: Record<string, string> = {
-    PAID: "PAID",
-    IN_ANALYSIS: "IN_ANALYSIS",
-    DECLINED: "DECLINED",
-    CANCELED: "CANCELED",
-    WAITING: "WAITING_PAYMENT",
-    EXPIRED: "EXPIRED",
-    ACTIVE: "CHECKOUT_CREATED",
-    INACTIVE: "CANCELED",
-  };
-  return statuses[status] ?? "PAYMENT_UPDATE";
 }
 
 async function sha256(value: string) {

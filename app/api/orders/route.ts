@@ -50,7 +50,7 @@ export async function POST(request: Request) {
       referenceId,
       customerName: input.customer!.name!.trim(),
       customerEmail: input.customer!.email!.trim().toLowerCase(),
-      customerPhone: digits(input.customer!.phone!),
+      customerPhone: normalizedPhoneDigits(input.customer!.phone!),
       customerDocument: digits(input.customer!.document!),
       postalCode: digits(input.shippingAddress!.postalCode!),
       address: input.shippingAddress!.address!.trim(),
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
 
     const requestUrl = new URL(request.url);
     const siteUrl = `${requestUrl.protocol}//${requestUrl.host}`;
-    const phone = digits(input.customer!.phone!);
+    const phone = normalizedPhoneDigits(input.customer!.phone!);
     const checkout = await createPagBankCheckout({
       reference_id: referenceId,
       customer: {
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
       soft_descriptor: "VIESTE CONCETTO",
       redirect_url: `${siteUrl}/pedido/${id}`,
       return_url: `${siteUrl}/pedido/${id}`,
-      redirect_waiting_time: 3,
+      redirect_waiting_time: 5,
       notification_urls: [`${siteUrl}/api/webhooks/pagbank`],
       payment_notification_urls: [`${siteUrl}/api/webhooks/pagbank`],
     });
@@ -149,7 +149,9 @@ function validateInput(input: OrderRequest) {
     if (!product || !line.size || !product.sizes.includes(line.size) || !Number.isInteger(line.quantity) || line.quantity! < 1 || line.quantity! > 20) return "Há um item inválido na sacola.";
   }
   const customer = input.customer;
-  if (!customer?.name?.trim() || !customer.email?.includes("@") || digits(customer.phone ?? "").length < 10 || digits(customer.document ?? "").length !== 11) return "Confira os dados de contato e CPF.";
+  const phoneDigits = normalizedPhoneDigits(customer?.phone ?? "");
+  const isMobilePhone = phoneDigits.length === 11 && phoneDigits[2] === "9";
+  if (!customer?.name?.trim() || !customer.email?.includes("@") || !isMobilePhone || digits(customer.document ?? "").length !== 11) return "Confira os dados de contato (o celular precisa ter DDD + 9 dígitos, começando com 9) e o CPF.";
   const address = input.shippingAddress;
   if (!address?.address?.trim() || !address.number?.trim() || !address.district?.trim() || !address.city?.trim() || address.state?.trim().length !== 2 || digits(address.postalCode ?? "").length !== 8) return "Confira o endereço de entrega.";
   return null;
@@ -163,6 +165,13 @@ function appendDoormanNote(complement: string | undefined, hasDoorman: boolean |
 
 function digits(value: string) {
   return value.replace(/\D/g, "");
+}
+
+// Autopreenchimento do navegador costuma salvar o telefone com "+55" na
+// frente — aceita o celular com ou sem DDI em vez de rejeitar.
+function normalizedPhoneDigits(value: string) {
+  const raw = digits(value);
+  return raw.length > 11 && raw.startsWith("55") ? raw.slice(2) : raw;
 }
 
 function priceInCents(price: string) {
